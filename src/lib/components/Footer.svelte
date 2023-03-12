@@ -1,7 +1,7 @@
 <script>
 	import { exampleScript } from "$scripts";
 
-	exampleScript();
+	//exampleScript();
 </script>
 
 <footer>

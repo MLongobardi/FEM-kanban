@@ -3,6 +3,8 @@
 	import { mediaStore } from "$stores";
     import { onMount } from "svelte";
 
+
+	export let data;
 	let loading = true;
 
     onMount(()=>{
@@ -11,7 +13,7 @@
 </script>
 
 <svelte:head>
-	<title>Svelte template</title>
+	<title>Frontend Mentor | Kanban task management web app</title>
 </svelte:head>
 
 <div class="media-wrapper {$mediaStore.bodyClassList}">
