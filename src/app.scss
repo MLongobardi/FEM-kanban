@@ -1,12 +1,30 @@
 @import "normalize.css";
 
+@font-face {
+	font-family: "PlusJakartaSans";
+	src: url("/fonts/PlusJakartaSans-VariableFont_wght.ttf") format("truetype");
+	font-weight: 100 1000;
+}
+
 body {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    display: grid;
+	grid-template-areas:
+		"side header"
+		"side main";
+	grid-template-columns: max-content 1fr;
+	grid-template-rows: max-content 1fr;
     min-height: 100vh;
     min-height: 100svh; /*Only when supported*/
+	font-family: "PlusJakartaSans";
+	font-weight: 700;
+	font-size: 12px;
+	line-height: 1.25em;
+}
+
+@for $i from 1 through 4 {
+	h#{$i} {
+		@extend %heading-#{$i};
+	}
 }
 
 button,

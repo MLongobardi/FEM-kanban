@@ -1,14 +1,58 @@
 /* Variables and mixins declared here will be available in all other SCSS files */
 @import "minMaxSize.scss";
 
-:root, ::backdrop {
-    /*global css variables*/
-    --loading-background-color: white;
-    --loading-text-color: black;
+:root,
+::backdrop {
+	/*global css variables*/
+	--main-purple: #635fc7;
+	--main-purple-hover: #a8a4ff;
+	--black: #000112;
+	--very-dark-grey: #20212c; //Dark BG
+	--dark-grey: #2b2c37;
+	--lines-dark: #3e3f4e;
+	--medium-grey: #828fa3;
+	--lines-light: #e4ebfa;
+	--light-grey: #f4f7fd; //Light BG
+	--red: #ea5555;
+	--red-hover: #ff9898;
+
+	--loading-background-color: white;
+	--loading-text-color: black;
+}
+
+%heading-1,
+%heading-2,
+%heading-3,
+%heading-4 {
+	color: var(--black);
+	line-height: 1.26em;
+}
+%heading-1 {
+	font-size: minMaxSize(18px, 20px);
+	.large-tablet & {
+		font-size: minMaxSize(20px, 24px, 768px, 1440px);
+	}
+}
+%heading-2 {
+	font-size: 18px;
+}
+%heading-3 {
+	font-size: 15px;
+}
+%heading-4 {
+	font-size: 12px;
+	letter-spacing: 2.4px;
+	color: var(--medium-grey);
+}
+
+%body-L {
+	font-weight: 500;
+	font-size: 13px;
+	line-height: 1.77em;
 }
 
 %screen-reader-only {
-    /*only visible to screen readers*/
+	/*only visible to screen readers*/
 	border: 0;
 	padding: 0;
 	margin: 0;

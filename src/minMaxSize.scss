@@ -1,7 +1,7 @@
 /**
- * minMaxSize scales a value linearly from $min-size to $max-size depending on the screen width, using vw units.
+ * minMaxSize scales a value linearly from $size-at-min to $size-at-max depending on the screen width, using vw units.
  * For example, if the screen size is at 33% of the way from $min-screen to $max-screen,
- * the returned value will similarly be at 33% of the way from $min-size to $max-size.
+ * the returned value will similarly be at 33% of the way from $size-at-min to $size-at-max.
  * minMaxSizeList paired with media queries is useful when a size must scale between multiple, unaligned points.
  * Original idea from: 
  * https://css-tricks.com/linearly-scale-font-size-with-css-clamp-based-on-the-viewport/

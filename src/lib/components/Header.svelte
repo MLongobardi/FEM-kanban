@@ -1,35 +1,24 @@
 <script>
-	import { Dialog } from "$comps";
-	import { dialogStore } from "$stores";
+	import { page } from "$app/stores";
 </script>
 
 <header>
-	<h1>This is the header</h1>
-	<p>And here is a button that opens a dialog box:</p>
-	<button on:click={$dialogStore.TEST.open}>open dialog</button>
+	<h1>{$page.data.boards[0].name}</h1>
 </header>
-
-<Dialog name="TEST" easyClose>
-	<div class="test-dialog">
-		I'm a dialog!
-		<button on:click={$dialogStore.TEST.close}>close dialog</button>
-	</div>
-</Dialog>
 
 <style lang="scss">
 	header {
-		text-align: center;
+		grid-area: header;
+		display: flex;
+		align-items: center;
+		height: minMaxSize(64px, 80px);
+		border-bottom: solid 1px var(--lines-light)
+	}
+	:global(.large-tablet) header {
+		height: minMaxSize(80px, 96px, 768px, 1440px);
 	}
 
-	.test-dialog {
-		background: white;
-		width: 600px;
-        max-width: 95vw;
-		height: 300px;
-		border: black solid 3px;
-	}
-
-	:global(dialog):has(> .test-dialog) {
-		border-radius: 30px;
+	h1 {
+		margin-left: 24px;
 	}
 </style>
