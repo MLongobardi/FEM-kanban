@@ -17,6 +17,9 @@
 	:global(.large-tablet) header {
 		height: minMaxSize(80px, 96px, 768px, 1440px);
 	}
+	:global(.dark) header {
+		background: var(--dark-grey);
+	}
 
 	h1 {
 		margin-left: 24px;

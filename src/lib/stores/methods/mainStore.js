@@ -1,16 +1,8 @@
-export function incrementCounter(draft) {
-	draft.counter++;
+export function changeColorMode(draft, mode) {
+	if (typeof mode == "boolean") draft.darkMode
+	else draft.darkMode = !draft.darkMode;
 }
 
-export function resetAfterN(draft, n) {
-	setTimeout(this._hiddenMethod, n);
-}
-
-export function _hiddenMethod(draft) {
-	draft.counter *= getZero();
-}
-
-/* Helper functions (don't export these) */
-function getZero() {
-	return 0;
+export function toggleSidebar(draft) {
+	draft.showSidebarOnBigScreen = !draft.showSidebarOnBigScreen;
 }

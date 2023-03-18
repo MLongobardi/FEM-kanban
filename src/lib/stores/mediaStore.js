@@ -54,8 +54,9 @@ function createGroupStore(queries) {
 
 const screenStore = createGroupStore(mediaQueries.screen);
 const miscStore = createGroupStore(mediaQueries.misc);
+const noPrintStore = createGroupStore(mediaQueries.noPrint);
 
-const mediaStore = derived([screenStore, miscStore], ([$screen, $misc]) => {
+const mediaStore = derived([screenStore, miscStore, noPrintStore], ([$screen, $misc, $noPrint]) => {
 	const currentScreen = Object.keys($screen).find((key) => $screen[key] == true) || "";
 	const miscClassString = Object.keys($misc)
 		.filter((key) => $misc[key])
@@ -65,6 +66,7 @@ const mediaStore = derived([screenStore, miscStore], ([$screen, $misc]) => {
 	return {
 		screen: $screen,
 		misc: $misc,
+		noPrint: $noPrint,
 		currentScreen: currentScreen,
 		bodyClassList: screenClassStrings[currentScreen] + " " + miscClassString || "",
 	};

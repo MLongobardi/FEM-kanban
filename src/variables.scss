@@ -24,7 +24,7 @@
 %heading-2,
 %heading-3,
 %heading-4 {
-	color: var(--black);
+	color: var(--heading-color);
 	line-height: 1.26em;
 }
 %heading-1 {
@@ -49,6 +49,46 @@
 	font-weight: 500;
 	font-size: 13px;
 	line-height: 1.77em;
+}
+
+%strip {
+	@extend %heading-3;
+	--current: var(--icon-url);
+	display: list-item;
+	background: none;
+	border: none;
+	text-align: start;
+	font-weight: inherit;
+	border-radius: 0px 100px 100px 0px;
+	width: minMaxSize(225px, 276px, 480px, 1440px);
+	padding: 0 2ch 0 minMaxSize(24px, 32px, 768px, 1440px);
+	box-sizing: border-box;
+	height: 48px;
+	line-height: 48px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+
+	:global(.hoverable) &:not(.active):hover {
+		background: rgba(99, 95, 199, 0.1);
+		--current: var(--icon-url-hover, var(--icon-url));
+		color: var(--main-purple);
+	}
+	:global(.dark.hoverable) &:not(.active):hover {
+		background: white;
+	}
+	&.active {
+		background: var(--main-purple);
+		--current: var(--icon-url-active, var(--icon-url));
+		color: white;
+	}
+
+	& span::before {
+		content: var(--current, none);
+		margin-right: minMaxSize(12px, 16px, 768px, 1440px);
+		position: relative;
+		bottom: -1.5px;
+	}
 }
 
 %screen-reader-only {

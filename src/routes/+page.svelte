@@ -1,6 +1,6 @@
 <script>
 	import { Header, Main, Sidebar, Loading } from "$comps";
-	import { mediaStore } from "$stores";
+	import { mainStore, mediaStore } from "$stores";
 	import { onMount } from "svelte";
 
 	//export let data;
@@ -8,6 +8,8 @@
 
 	onMount(() => {
 		loading = false;
+		if ($mediaStore.noPrint.prefersLight) mainStore.changeColorMode(false);
+		if ($mediaStore.noPrint.prefersDark) mainStore.changeColorMode(true);
 	});
 </script>
 
@@ -15,7 +17,7 @@
 	<title>Frontend Mentor | Kanban task management web app</title>
 </svelte:head>
 
-<div class="media-wrapper {$mediaStore.bodyClassList}">
+<div class="media-wrapper {$mediaStore.bodyClassList}" class:dark={$mainStore.darkMode}>
 	{#if loading}
 		<Loading />
 	{/if}

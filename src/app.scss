@@ -7,18 +7,23 @@
 }
 
 body {
-    display: grid;
+	--heading-color: var(--black);
+	display: grid;
 	grid-template-areas:
 		"side header"
 		"side main";
 	grid-template-columns: max-content 1fr;
 	grid-template-rows: max-content 1fr;
-    min-height: 100vh;
-    min-height: 100svh; /*Only when supported*/
+	min-height: 100vh;
+	min-height: 100svh; /*Only when supported*/
 	font-family: "PlusJakartaSans";
 	font-weight: 700;
 	font-size: 12px;
 	line-height: 1.25em;
+	color: var(--dark-grey);
+}
+.dark {
+	--heading-color: white;
 }
 
 @for $i from 1 through 4 {
@@ -29,14 +34,13 @@ body {
 
 button,
 input[type="submit"],
-label:has(input[type="radio"]) {
-	//background: none;
-	//border: none;
-	//padding: 0;
+label:has(input[type="radio"]),
+label:has(input[type="checkbox"]) {
 	user-select: none;
-	transition: background-color 0.3s;
-}
-.hoverable :is(button, input[type="submit"], label:has(input[type="radio"])):not(:disabled) {
-	/*Only set on non-mobile devices to avoid the blue flash on tap*/
-	cursor: pointer;
+	transition: background-color 0.25s;
+
+	.hoverable &:not(:disabled) {
+		/*Only set on non-mobile devices to avoid the blue flash on tap*/
+		cursor: pointer;
+	}
 }

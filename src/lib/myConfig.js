@@ -1,8 +1,9 @@
 /**
  * mediaQueries.screen entries should go from smallest screen to biggest and in camelCase
  * The mobile one can't contain min-width, non-mobile ones must include it
- * $mediaStore.screenClassList returns a list of css classes which consists of the first 3 characters of each key converted into kebab-case
- * For example, the largeTablet key becomes the lar-tab class
+ * $mediaStore.bodyClassList returns a list of css classes which consists of each key converted into kebab-case
+ * For example, the largeTablet key becomes the large-tablet class
+ * Properties under noPrint won't be present in bodyClassList
  */
 export const mediaQueries = {
 	screen: {
@@ -14,5 +15,9 @@ export const mediaQueries = {
 	misc: {
 		hoverable: "(hover: hover) and (pointer: fine)",
 		prefersReducedMotion: "(prefers-reduced-motion: reduce)",
+	},
+	noPrint: {
+		prefersLight: "(prefers-color-scheme: light)",
+		prefersDark: "(prefers-color-scheme: dark",
 	},
 };
