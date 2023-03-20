@@ -3,6 +3,7 @@ import initializeStore from "./utility/initializeStore.js";
 import * as mainStoreMethods from "./methods/mainStore.js";
 
 const startObject = {
+	currentBoard: 0,
 	darkMode: true,
 	showSidebarOnBigScreen: true,
 };

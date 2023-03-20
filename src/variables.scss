@@ -24,6 +24,7 @@
 %heading-2,
 %heading-3,
 %heading-4 {
+	font-weight: bold;
 	color: var(--heading-color);
 	line-height: 1.26em;
 }
@@ -70,7 +71,7 @@
 	text-overflow: ellipsis;
 
 	:global(.hoverable) &:not(.active):hover {
-		background: rgba(99, 95, 199, 0.1);
+		background-color: rgba(99, 95, 199, 0.1);
 		--current: var(--icon-url-hover, var(--icon-url));
 		color: var(--main-purple);
 	}
@@ -88,6 +89,18 @@
 		margin-right: minMaxSize(12px, 16px, 768px, 1440px);
 		position: relative;
 		bottom: -1.5px;
+	}
+}
+
+%dropdown {
+	display: flex;
+	flex-direction: column;
+	background: white;
+	border-radius: 8px;
+	color: var(--medium-grey);
+
+	:global(.dark) & {
+		background-color: var(--very-dark-grey);
 	}
 }
 

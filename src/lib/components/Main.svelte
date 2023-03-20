@@ -2,11 +2,11 @@
 	import { page } from "$app/stores";
 	import { enhance } from "$app/forms";
 	import { mainStore, mediaStore } from "$stores";
-	import { fade, slide } from "svelte/transition";
+	import { slide } from "svelte/transition";
+	import { quintOut } from "svelte/easing";
 
 	function reducedSlide(node, options) {
-		if ($mediaStore.misc.prefersReducedMotion) return fade(node, {delay: 100, duration: 100});
-		return slide(node, options);
+		if (!$mediaStore.misc.prefersReducedMotion) return slide(node, options);
 	}
 
 	const optimistic = {
@@ -55,9 +55,9 @@
 	</p>
 	
 	{#if $mediaStore.currentScreen != "mobile"}
-		<!--double if so that the transition only works on the second condition, thanks to |local-->
+		<!--double if block so that the transition only works on the second condition, thanks to |local-->
 		{#if !$mainStore.showSidebarOnBigScreen}
-		<button class="show-sidebar" on:click={mainStore.toggleSidebar} transition:reducedSlide|local={{axis:"x", duration: 200, delay: 200}}>
+		<button class="show-sidebar" on:click={mainStore.toggleSidebar} transition:reducedSlide|local={{axis:"x", duration: 400, easing: quintOut}}>
 			<img alt="show sidebar" src="/images/icon-show-sidebar.svg" />
 		</button>
 		{/if}
@@ -84,6 +84,6 @@
 	}
 	.show-sidebar img {
 		display: block;
-		margin-left: 18px;
+		margin: auto;
 	}
 </style>

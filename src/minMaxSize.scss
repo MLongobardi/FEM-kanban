@@ -22,7 +22,7 @@
 
 	$slope: math.div($size-at-max - $size-at-min, $max-screen - $min-screen);
     $y-intersection: $size-at-min - $min-screen * $slope;
-
+    
     $smallest-size: math.min($size-at-min, $size-at-max);
     $biggest-size: math.max($size-at-min, $size-at-max);
 

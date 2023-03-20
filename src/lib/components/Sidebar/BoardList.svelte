@@ -1,12 +1,13 @@
 <script>
 	import { page } from "$app/stores";
+	import { mainStore } from "$stores";
 </script>
 
 <section>
 	<h4>ALL BOARDS ({$page.data.boards.length})</h4>
 	{#each $page.data.boards as board, i}
-		{@const active = i == 0}
-		<button class="board" class:active disabled={active}>
+		{@const active = i == $mainStore.currentBoard}
+		<button class="board" class:active disabled={active} on:click={()=>{mainStore.setBoard(i)}}>
 			<span>{board.name}</span>
 		</button>
 	{/each}

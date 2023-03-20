@@ -38,7 +38,7 @@ label:has(input[type="radio"]),
 label:has(input[type="checkbox"]) {
 	user-select: none;
 	transition: background-color 0.25s;
-
+	
 	.hoverable &:not(:disabled) {
 		/*Only set on non-mobile devices to avoid the blue flash on tap*/
 		cursor: pointer;

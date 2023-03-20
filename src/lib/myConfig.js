@@ -7,8 +7,8 @@
  */
 export const mediaQueries = {
 	screen: {
-		mobile: "(max-width: 479px)",
-		tablet: "(min-width: 480px) and (max-width: 767px)",
+		mobile: "(max-width: 549px)",
+		tablet: "(min-width: 550px) and (max-width: 767px)",
 		largeTablet: "(min-width: 768px) and (max-width: 1199px)",
 		desktop: "(min-width: 1200px)",
 	},
@@ -18,6 +18,6 @@ export const mediaQueries = {
 	},
 	noPrint: {
 		prefersLight: "(prefers-color-scheme: light)",
-		prefersDark: "(prefers-color-scheme: dark",
+		prefersDark: "(prefers-color-scheme: dark)",
 	},
 };

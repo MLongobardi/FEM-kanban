@@ -1,12 +1,11 @@
 <script>
 	import { BoardList, DarkLightSwitch } from "$comps";
 	import { mainStore, mediaStore } from "$stores";
-	import { fade, slide } from "svelte/transition";
+	import { slide } from "svelte/transition";
 	import { quintOut } from "svelte/easing";
 
 	function reducedSlide(node, options) {
-		if ($mediaStore.misc.prefersReducedMotion) return;
-		return slide(node, options);
+		if (!$mediaStore.misc.prefersReducedMotion) return slide(node, options);
 	}
 </script>
 
@@ -41,8 +40,8 @@
 		white-space: nowrap;
 		height: 100%;
 		--left: #{minMaxSize(24px, 32px, 768px, 1440px)};
-		position: relative;
-		z-index: 1;
+		//position: relative;
+		//z-index: 1;
 	}
 	:global(.dark) aside {
 		background: var(--dark-grey);

@@ -14,6 +14,8 @@
 	 * to close it
 	 *
 	 * A Dialog instance won't be added to the dialogStore if it isn't named.
+	 * 
+	 * The dialog's content will only be printed when the dialog is open.
 	 *
 	 * The dialog backdrop doesn't inherit anything, so it can only use css variables declared in ::backdrop
 	 *
@@ -22,19 +24,21 @@
 	 */
 
 	export let name;
-	export let easyClose = false;
 	export let startOpen = false;
+	export let easyClose = !startOpen;
 	export let onOpen = false;
 	export let onClose = false;
 	export let onEasyClose = easyClose ? onClose : false;
 
 	let dialog;
+	let showContent = false;
 
 	onMount(() => {
-		//hijack native methods, until they add an on:open event
+		//hijack native methods
 		dialog.myShowModal = () => {
 			if (dialog.open) return;
 			if (typeof onOpen == "function") onOpen();
+			showContent = true;
 			dialog.showModal();
 		};
 		dialog.myClose = (mode) => {
@@ -42,15 +46,19 @@
 			if (mode == "easy" && typeof onEasyClose == "function") onEasyClose();
 			if (mode != "easy" && typeof onClose == "function") onClose();
 			dialog.close();
+			showContent = false;
 		};
 
-		if (startOpen) dialog.showModal();
+		if (startOpen) {
+			showContent = true;
+			dialog.showModal();
+		}
 
 		if (name) dialogStore.addInstance(name, dialog);
 	});
 
 	onDestroy(() => {
-		dialogStore.removeInstance(name);
+		if (name) dialogStore.removeInstance(name);
 	});
 
 	function handlePointDown(e) {
@@ -83,16 +91,18 @@
 </script>
 
 <dialog bind:this={dialog} on:pointerdown|self={handlePointDown}>
-	<slot {dialog}>
-		<div>
-			Empty Dialog!
-			<button
-				on:click={() => {
-					dialog.myClose();
-				}}>Close</button
-			>
-		</div>
-	</slot>
+	{#if showContent}
+		<slot {dialog}>
+			<div>
+				Empty Dialog!
+				<button
+					on:click={() => {
+						dialog.myClose();
+					}}>Close</button
+				>
+			</div>
+		</slot>
+	{/if}
 </dialog>
 
 <style lang="scss">
@@ -117,7 +127,7 @@
 		width: 100%;
 		border-radius: inherit;
 	}
-
+	
 	:global(body):has(dialog[open]) {
 		overflow: hidden;
 	}
