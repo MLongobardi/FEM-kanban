@@ -3,7 +3,7 @@ export function setBoard(draft, id) {
 }
 
 export function changeColorMode(draft, mode) {
-	if (typeof mode == "boolean") draft.darkMode
+	if (typeof mode == "boolean") draft.darkMode = mode;
 	else draft.darkMode = !draft.darkMode;
 }
 

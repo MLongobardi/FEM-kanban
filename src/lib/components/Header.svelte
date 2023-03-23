@@ -1,6 +1,6 @@
 <script>
 	import { page } from "$app/stores";
-	import { mainStore, mediaStore } from "$stores";
+	import { mainStore, mediaStore, dialogStore } from "$stores";
 	import { slide } from "svelte/transition";
 	import { quintOut } from "svelte/easing";
 
@@ -40,9 +40,14 @@
 			<img alt="logo kanban" src="/images/logo-mobile.svg" />
 		{/if}
 		<h1>{$page.data.boards[$mainStore.currentBoard].name}</h1>
+		{#if $mediaStore.currentScreen == "mobile"}
+			<button on:click={$dialogStore.MOBILESIDEBAR.open}>
+				<img alt="Open mobile sidebar" src="/images/icon-chevron-down.svg"/>
+			</button>
+		{/if}
 	</div>
 	<div class="right">
-		<button class="new-task">
+		<button class="new-task" on:click={$dialogStore.ADDEDITTASK.open}>
 			{#if $mediaStore.currentScreen == "mobile"}
 				<img alt="add task" src="/images/icon-add-task-mobile.svg" />
 			{:else}
@@ -83,9 +88,6 @@
 		display: flex;
 		align-items: center;
 	}
-	.left img {
-		margin-left: minMaxSize(16px, 24px);
-	}
 
 	.logo-holder {
 		display: flex;
@@ -98,6 +100,10 @@
 	}
 	:global(.dark) .logo-holder {
 		border-right: solid 1px var(--lines-dark);
+	}
+
+	.logo-holder img, .left > img {
+		margin-left: minMaxSize(16px, 24px);
 	}
 
 	h1 {

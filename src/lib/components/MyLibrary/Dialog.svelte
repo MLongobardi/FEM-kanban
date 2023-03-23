@@ -13,13 +13,13 @@
 	 * $dialogStore.DIALOG_NAME.close()
 	 * to close it
 	 *
-	 * A Dialog instance won't be added to the dialogStore if it isn't named.
+	 * A Dialog instance won't be added to the dialogStore if it isn't given a name prop.
 	 * 
 	 * The dialog's content will only be printed when the dialog is open.
 	 *
 	 * The dialog backdrop doesn't inherit anything, so it can only use css variables declared in ::backdrop
 	 *
-	 * border-radius should be applied to the dialog itself, you can target it with:
+	 * width, height and border-radius should be applied to the dialog itself, you can target it inside another component with:
 	 * :global(dialog):has(> .name-of-content-div) {}
 	 */
 

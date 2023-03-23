@@ -9,57 +9,61 @@
 		if (!$mediaStore.misc.prefersReducedMotion) return slide(node, options);
 	}
 
-	const optimistic = {
-		using: false,
-		data: {},
-	};
-
-	function addEnhance({ data }) {
-		optimistic.using = true;
-		optimistic.data.addTest = data.get("addTest");
+	function addTaskEnhance({ data }) {
+		console.time("addTask");
+		console.log('Adding task named "'+ data.get("title") +'"...');
 
 		return async ({ update }) => {
 			await update();
-			optimistic.using = false;
-		};
-	}
-
-	function resetEnhance() {
-		optimistic.using = true;
-		optimistic.data = {};
-
-		return async ({ update }) => {
-			await update();
-			optimistic.using = false;
+			console.timeEnd("addTask");
+			console.log("Task added!");
 		};
 	}
 </script>
 
 <main>
-	DB Test:
-
-	<form method="POST" action="?/add" use:enhance={addEnhance}>
-		testing ADD
-		<input name="addTest" />
+	<form method="POST" action="?/addTask" use:enhance={addTaskEnhance} style="width: fit-content; margin: auto; margin-bottom: 20px">
+		<input type="hidden" name="boardId" value={$mainStore.currentBoard} />
+		<fieldset style="display: flex; flex-direction: column">
+			<legend>Add New Task</legend>
+			<input type="text" name="title" placeholder="title" required />
+			<select name="status" required>
+				{#each $page.data.boards[$mainStore.currentBoard].columns as c}
+					<option value={c.name}>{c.name}</option>
+				{/each}
+			</select>
+			<textarea name="description" placeholder="description" />
+		</fieldset>
+		<input type="submit" />
 	</form>
-
-	<form method="POST" action="?/reset" use:enhance={resetEnhance}>
-		<input type="submit" name="resetTest" value="testing RESET" />
-	</form>
-
-	<p>data.addTest: {optimistic.using ? optimistic.data.addTest : $page.data.addTest}</p>
-	<p>
-		Above data is currently being read by: {optimistic.using
-			? "component internal state"
-			: "database"}
-	</p>
-	
+	Current tasks (test):
+	<div style="display: flex; margin: auto; width: fit-content">
+		{#each $page.data.boards[$mainStore.currentBoard].columns as c}
+			<div>
+				<h2>{c.name}</h2>
+				{#each c.tasks as t}
+					<div style="margin: 10px; width: 250px">
+						<h3>{t.title}</h3>
+						{t.description}
+					</div>
+				{:else}
+					<div style="margin: 10px; width: 250px">
+						<h2>No Tasks!</h2>
+					</div>
+				{/each}
+			</div>
+		{/each}
+	</div>
 	{#if $mediaStore.currentScreen != "mobile"}
 		<!--double if block so that the transition only works on the second condition, thanks to |local-->
 		{#if !$mainStore.showSidebarOnBigScreen}
-		<button class="show-sidebar" on:click={mainStore.toggleSidebar} transition:reducedSlide|local={{axis:"x", duration: 400, easing: quintOut}}>
-			<img alt="show sidebar" src="/images/icon-show-sidebar.svg" />
-		</button>
+			<button
+				class="show-sidebar"
+				on:click={mainStore.toggleSidebar}
+				transition:reducedSlide|local={{ axis: "x", duration: 400, easing: quintOut }}
+			>
+				<img alt="show sidebar" src="/images/icon-show-sidebar.svg" />
+			</button>
 		{/if}
 	{/if}
 </main>

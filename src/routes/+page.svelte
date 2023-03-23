@@ -1,5 +1,5 @@
 <script>
-	import { Header, Main, Sidebar, Loading } from "$comps";
+	import { Header, Main, Sidebar, Loading, ModalsPrinter } from "$comps";
 	import { mainStore, mediaStore } from "$stores";
 	import { onMount } from "svelte";
 
@@ -27,6 +27,7 @@
 	{/if}
 	<Header />
 	<Main />
+	<ModalsPrinter />
 </div>
 
 <style lang="scss">

@@ -4,6 +4,8 @@ import * as mainStoreMethods from "./methods/mainStore.js";
 
 const startObject = {
 	currentBoard: 0,
+	currentActionType: "", //"ADD" | "EDIT" | ""
+	currentEditInfo: {},
 	darkMode: true,
 	showSidebarOnBigScreen: true,
 };

@@ -1,22 +1,36 @@
 import * as db from "$lib/server/db.js";
 
 export function load() {
-    const id = "test";
+	const id = "test";
 
-    return db.getData(id);
+	return db.getData(id);
 }
 
 export const actions = {
-    add: async ({ request }) => {
-        await new Promise((fulfil) => setTimeout(fulfil, 1500));
+	addTest: async ({ request }) => {
+		await new Promise((fulfil) => setTimeout(fulfil, 1200));
 
-        const data = await request.formData();
-        db.addData("test", { addTest: data.get("addTest") });
-    },
+		const data = await request.formData();
+		console.log(data.get("addTest"));
+		db.addDataTest("test", { addTest: data.get("addTest") });
+	},
 
-    reset: async () => {
-        await new Promise((fulfil) => setTimeout(fulfil, 1500));
+	resetTest: async () => {
+		await new Promise((fulfil) => setTimeout(fulfil, 1200));
 
-        db.resetData("test")
-    }
-}
+		db.resetDataTest("test");
+	},
+
+	addTask: async ({ request }) => {
+		const info = await request.formData();
+		const boardId = info.get("boardId");
+		const column = info.get("status");
+		const newTask = {
+			title: info.get("title"),
+			status: column,
+			description: info.get("description"),
+			subtasks: info.get("subtasks"),
+		};
+		db.addTask("test", boardId, newTask);
+	},
+};

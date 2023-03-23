@@ -9,3 +9,7 @@ export { default as DarkLightSwitch } from "src/lib/components/Sidebar/DarkLight
 export { default as BoardList } from "src/lib/components/Sidebar/BoardList.svelte";
 export { default as Dialog } from "src/lib/components/MyLibrary/Dialog.svelte";
 export { default as Loading } from "src/lib/components/MyLibrary/Loading.svelte";
+export { default as MobileSidebar } from "src/lib/components/Modals/MobileSidebar.svelte";
+export { default as AddEditBoard } from "src/lib/components/Modals/AddEditBoard.svelte";
+export { default as AddEditTask } from "src/lib/components/Modals/AddEditTask.svelte";
+export { default as ModalsPrinter } from "src/lib/components/ModalsPrinter.svelte";
