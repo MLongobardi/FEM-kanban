@@ -1,48 +1,27 @@
 <script>
 	import { page } from "$app/stores";
 	import { dialogStore, mainStore, mediaStore } from "$stores";
+	import { TaskCard } from "$comps";
 	import { slide } from "svelte/transition";
 	import { quintOut } from "svelte/easing";
 
 	function reducedSlide(node, options) {
 		if (!$mediaStore.misc.prefersReducedMotion) return slide(node, options);
 	}
-
-	function openModal(c,t) {
-		mainStore.beforeActionModal("EDIT", [c,t]);
-		$dialogStore.ADDEDITTASK.open();
-	}
 </script>
 
 <main>
-	Current tasks (test):
-	<div style="display: flex; margin: auto; width: fit-content">
-		{#each $page.data.boards[$mainStore.currentBoard].columns as c,i}
-			<div>
-				<h2>{c.name}</h2>
-				{#each c.tasks as t,j}
-					<div style="margin: 10px; width: 250px; border: 1px solid grey">
-						<h3>{t.title}</h3>
-						<p style="margin: 0">{t.description}</p>
-						<hr>
-						{#if t.subtasks.length > 0}
-							<h4>Subtasks ({t.subtasks.length}):</h4>
-							{#each t.subtasks as s} 
-								<div style={s.isCompleted ? "text-decoration: line-through;" : "" }>{s.title}</div>
-							{/each}
-						{:else}
-						No subtasks!<br>
-						{/if}
-						<button on:click={()=>{openModal(i,j)}}>edit task</button>
-					</div>
-				{:else}
-					<div style="margin: 10px; width: 250px">
-						<h2>No Tasks!</h2>
-					</div>
-				{/each}
-			</div>
-		{/each}
-	</div>
+	{#each $page.data.boards[$mainStore.currentBoard].columns as c, i}
+		<section class="column">
+			<h2 style:--dotColor={["#49C4E5", "#8471F2", "#67E2AE"][i]}>{c.name}</h2>
+			{#each c.tasks as t, j}
+				{@const total = t.subtasks.length}
+				{@const completed = t.subtasks.filter((s) => s.isCompleted).length}
+				<TaskCard colId={i} taskId={j} title={t.title} {completed} {total} />
+			{/each}
+		</section>
+	{/each}
+
 	{#if $mediaStore.currentScreen != "mobile"}
 		<!--double if block so that the transition only works on the second condition, thanks to |local-->
 		{#if !$mainStore.showSidebarOnBigScreen}
@@ -60,7 +39,7 @@
 <style lang="scss">
 	main {
 		grid-area: main;
-		text-align: center;
+		display: flex;
 		background: var(--light-grey);
 		overflow: auto;
 	}
@@ -85,5 +64,28 @@
 	.show-sidebar img {
 		display: block;
 		margin: auto;
+	}
+
+	.column {
+		width: 280px;
+		flex-shrink: 0;
+		margin-top: 24px;
+		margin-left: 24px;
+		display: flex; //prevents margins collapsing, so that the .task-card:active effect works
+		flex-direction: column;
+	}
+	.column h2 {
+		@extend %heading-4;
+		margin-bottom: 24px;
+
+		&::before {
+			content: "";
+			display: inline-block;
+			height: 100%;
+			width: 15px;
+			background: var(--dotColor);
+			border-radius: 50%;
+			margin-right: 12px;
+		}
 	}
 </style>

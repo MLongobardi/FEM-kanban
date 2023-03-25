@@ -25,9 +25,13 @@ export const actions = {
 			title: data.title,
 			description: data.description,
 			status: data.status,
-		}
-		db.editTask("test", data.taskInfo, newTask, data.subtasks)
+		};
+		db.editTask("test", data.taskInfo, newTask, data.subtasks);
 	},
+};
+
+const expectedKeys = {
+	task: ["taskInfo", "title", "description", "subtasks", "status"],
 };
 
 function processTaskData(preData) {
@@ -35,10 +39,10 @@ function processTaskData(preData) {
 	data.subtasks = [];
 
 	for (let [key, value] of preData) {
+		if (!expectedKeys.task.includes(key)) continue;
 		if (key == "subtasks") {
 			if (!!value && !data[key].includes(value)) data[key] = data[key].concat(value);
-		}
-		else if (key == "taskInfo") data[key] = value.split(",");
+		} else if (key == "taskInfo") data[key] = value.split(",");
 		else data[key] = value;
 	}
 

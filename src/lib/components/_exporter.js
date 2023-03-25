@@ -13,3 +13,4 @@ export { default as MobileSidebar } from "src/lib/components/Modals/MobileSideba
 export { default as AddEditBoard } from "src/lib/components/Modals/AddEditBoard.svelte";
 export { default as AddEditTask } from "src/lib/components/Modals/AddEditTask.svelte";
 export { default as ModalsPrinter } from "src/lib/components/ModalsPrinter.svelte";
+export { default as TaskCard } from "src/lib/components/TaskCard.svelte";

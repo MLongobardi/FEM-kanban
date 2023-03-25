@@ -16,6 +16,7 @@ body {
 	grid-template-rows: max-content 1fr;
 	height: 100vh;
 	height: 100svh; /*Only when supported*/
+	overflow: hidden;
 	font-family: "PlusJakartaSans";
 	font-weight: 700;
 	font-size: 12px;
@@ -41,6 +42,10 @@ dialog > div {
 	box-sizing: border-box;
 	padding: minMaxSize(24px, 32px);
 }
+.dark dialog > div {
+	background: var(--dark-grey);
+	color: white;
+}
 dialog > div :is(input[type="text"], textarea, select) {
 	@extend %body-L;
 	width: 100%;
@@ -48,9 +53,8 @@ dialog > div :is(input[type="text"], textarea, select) {
 	border-radius: 4px;
 	border: 1px solid rgba(130, 143, 163, 0.25);
 	padding: 7px 15px 8px 15px;
-	
+
 	&:focus-visible {
-		//outline: solid var(--main-purple);
 		outline-style: solid;
 		outline-color: var(--main-purple);
 	}
@@ -59,10 +63,28 @@ dialog > div :is(input[type="text"], textarea, select) {
 		background: var(--dark-grey);
 		color: white;
 	}
+
+	&:invalid:not(:focus-visible) {
+		border-color: var(--red);
+	}
 }
-.dark dialog > div {
-	background: var(--dark-grey);
-	color: white;
+
+.select-wrap {
+	position: relative;
+}
+.select-wrap::after {
+	content: url("/images/icon-chevron-down.svg");
+	display: block;
+	position: absolute;
+	right: 15px;
+	top: calc(50% - 7.5px);
+	pointer-events: none;
+}
+.select-wrap select {
+	appearance: none;
+}
+.select-wrap select::-ms-expand {
+	display: none; /* IE */
 }
 
 fieldset {

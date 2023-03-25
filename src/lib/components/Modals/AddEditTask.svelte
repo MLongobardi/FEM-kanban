@@ -85,8 +85,8 @@
 							value={s.title}
 							placeholder={["e.g. Make coffee", "e.g. Drink coffee & smile"][i % 2]}
 						/>
-						<button type="button" class="delete-task" on:click={() => removeSubtask(i)}>
-							<img alt="delete subtask" src="/images/icon-cross.svg" />
+						<button type="button" class="delete-subtask" on:click={() => removeSubtask(i)}>
+							<span class="sr-only">Delete subtask</span>
 						</button>
 					</div>
 				{/each}
@@ -95,11 +95,13 @@
 		</fieldset>
 		<fieldset>
 			<legend>Status</legend>
-			<select name="status">
-				{#each columns.map((col) => col.name) as c}
-					<option value={c}>{c}</option>
-				{/each}
-			</select>
+			<div class="select-wrap">
+				<select name="status">
+					{#each columns.map((col) => col.name) as c}
+						<option value={c}>{c}</option>
+					{/each}
+				</select>
+			</div>
 		</fieldset>
 		<input type="submit" value={isAdd ? "Create Task" : "Save Changes"} />
 	</form>
@@ -120,26 +122,56 @@
 		margin: 0;
 	}
 
-	.delete-task {
+	.delete-subtask {
+		--cross-url: url("/images/icon-cross.svg");
 		display: block;
 		background: none;
 		border: none;
+		padding: 0;
+		padding-left: 10px;
+		margin-left: 6px;
+	}
+	.delete-subtask::after {
+		content: var(--cross-url);
+	}
+	:global(.hoverable) .delete-subtask:hover {
+		--cross-url: url("/images/icon-cross-red.svg");
+	}
+
+	.sr-only {
+		@extend %screen-reader-only;
 	}
 
 	.add-subtask,
 	input[type="submit"] {
+		@extend %body-L;
 		width: 100%;
 		border-radius: 20px;
 		border: none;
 		height: 40px;
-		font-weight: inherit;
 		background: rgba(99, 95, 199, 0.1);
+		font-weight: inherit;
 		color: var(--main-purple);
 		margin-top: 12px;
 	}
+	:global(.hoverable) .add-subtask:hover {
+		background: rgba(99, 95, 199, 0.25);
+	}
+	:global(.dark) .add-subtask {
+		background: white !important;
+	}
+
 	input[type="submit"] {
 		margin-top: 24px;
 		background: var(--main-purple);
 		color: white;
+		transition: opacity 0.3s;
+	}
+	:global(.hoverable) input[type="submit"]:hover {
+		background: var(--main-purple-hover);
+	}
+	form:has(:invalid) input[type="submit"] {
+		pointer-events: none;
+		opacity: 0.3;
 	}
 </style>
