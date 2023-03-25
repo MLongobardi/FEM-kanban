@@ -1,12 +1,12 @@
 <script>
 	import { Dialog, AddEditBoard, AddEditTask, MobileSidebar } from "$comps";
-	import { mediaStore } from "$stores";
+	import { mainStore, mediaStore } from "$stores";
 </script>
 
-<Dialog name="ADDEDITBOARD">
+<Dialog name="ADDEDITBOARD" onClose={mainStore.afterActionModal}>
 	<AddEditBoard />
 </Dialog>
-<Dialog name="ADDEDITTASK">
+<Dialog name="ADDEDITTASK" onClose={mainStore.afterActionModal}>
 	<AddEditTask />
 </Dialog>
 {#if $mediaStore.currentScreen == "mobile"}

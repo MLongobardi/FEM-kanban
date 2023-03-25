@@ -5,7 +5,10 @@ import * as mainStoreMethods from "./methods/mainStore.js";
 const startObject = {
 	currentBoard: 0,
 	currentActionType: "", //"ADD" | "EDIT" | ""
-	currentEditInfo: {},
+	currentTaskInEdit: {
+		columnId: null,
+		taskId: null,
+	},
 	darkMode: true,
 	showSidebarOnBigScreen: true,
 };

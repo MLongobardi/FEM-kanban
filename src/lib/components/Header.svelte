@@ -10,6 +10,11 @@
 		if (!$mediaStore.misc.prefersReducedMotion) return slide(node, options);
 	}
 
+	function openModal() {
+		mainStore.beforeActionModal("ADD");
+		$dialogStore.ADDEDITTASK.open();
+	}
+
 	function handlePointerUp(e) {
 		if (!showDropdown) document.removeEventListener("pointerup", handlePointerUp);
 		if (!e.target.matches(":is(.header-dropdown, .open-menu, .open-menu *)")) {
@@ -17,7 +22,7 @@
 			document.removeEventListener("pointerup", handlePointerUp);
 		}
 	}
-	
+
 	function openDropDown() {
 		if (showDropdown) return;
 		showDropdown = true;
@@ -47,7 +52,7 @@
 		{/if}
 	</div>
 	<div class="right">
-		<button class="new-task" on:click={$dialogStore.ADDEDITTASK.open}>
+		<button class="new-task" on:click={openModal}>
 			{#if $mediaStore.currentScreen == "mobile"}
 				<img alt="add task" src="/images/icon-add-task-mobile.svg" />
 			{:else}
@@ -80,6 +85,7 @@
 	}
 	:global(.dark) header {
 		background: var(--dark-grey);
+		border-color: var(--lines-dark);
 	}
 
 	.left,
@@ -92,7 +98,6 @@
 	.logo-holder {
 		display: flex;
 		align-items: center;
-		//padding-left: 24px;
 		box-sizing: border-box;
 		width: 205px;
 		height: 100%;

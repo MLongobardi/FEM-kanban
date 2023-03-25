@@ -1,7 +1,6 @@
 <script>
 	import { page } from "$app/stores";
-	import { enhance } from "$app/forms";
-	import { mainStore, mediaStore } from "$stores";
+	import { dialogStore, mainStore, mediaStore } from "$stores";
 	import { slide } from "svelte/transition";
 	import { quintOut } from "svelte/easing";
 
@@ -9,42 +8,32 @@
 		if (!$mediaStore.misc.prefersReducedMotion) return slide(node, options);
 	}
 
-	function addTaskEnhance({ data }) {
-		console.time("addTask");
-		console.log('Adding task named "'+ data.get("title") +'"...');
-
-		return async ({ update }) => {
-			await update();
-			console.timeEnd("addTask");
-			console.log("Task added!");
-		};
+	function openModal(c,t) {
+		mainStore.beforeActionModal("EDIT", [c,t]);
+		$dialogStore.ADDEDITTASK.open();
 	}
 </script>
 
 <main>
-	<form method="POST" action="?/addTask" use:enhance={addTaskEnhance} style="width: fit-content; margin: auto; margin-bottom: 20px">
-		<input type="hidden" name="boardId" value={$mainStore.currentBoard} />
-		<fieldset style="display: flex; flex-direction: column">
-			<legend>Add New Task</legend>
-			<input type="text" name="title" placeholder="title" required />
-			<select name="status" required>
-				{#each $page.data.boards[$mainStore.currentBoard].columns as c}
-					<option value={c.name}>{c.name}</option>
-				{/each}
-			</select>
-			<textarea name="description" placeholder="description" />
-		</fieldset>
-		<input type="submit" />
-	</form>
 	Current tasks (test):
 	<div style="display: flex; margin: auto; width: fit-content">
-		{#each $page.data.boards[$mainStore.currentBoard].columns as c}
+		{#each $page.data.boards[$mainStore.currentBoard].columns as c,i}
 			<div>
 				<h2>{c.name}</h2>
-				{#each c.tasks as t}
-					<div style="margin: 10px; width: 250px">
+				{#each c.tasks as t,j}
+					<div style="margin: 10px; width: 250px; border: 1px solid grey">
 						<h3>{t.title}</h3>
-						{t.description}
+						<p style="margin: 0">{t.description}</p>
+						<hr>
+						{#if t.subtasks.length > 0}
+							<h4>Subtasks ({t.subtasks.length}):</h4>
+							{#each t.subtasks as s} 
+								<div style={s.isCompleted ? "text-decoration: line-through;" : "" }>{s.title}</div>
+							{/each}
+						{:else}
+						No subtasks!<br>
+						{/if}
+						<button on:click={()=>{openModal(i,j)}}>edit task</button>
 					</div>
 				{:else}
 					<div style="margin: 10px; width: 250px">
@@ -73,10 +62,17 @@
 		grid-area: main;
 		text-align: center;
 		background: var(--light-grey);
+		overflow: auto;
+	}
+	:global(.dark) main {
+		background: var(--very-dark-grey);
 	}
 
 	.show-sidebar {
-		@extend %strip;
+		display: block;
+		border: none;
+		border-radius: 0px 100px 100px 0px;
+		height: 48px;
 		width: 56px;
 		position: absolute;
 		bottom: 32px;
@@ -84,7 +80,7 @@
 		padding: 0;
 	}
 	:global(.hoverable) .show-sidebar:hover {
-		background: var(--main-purple-hover) !important;
+		background: var(--main-purple-hover);
 	}
 	.show-sidebar img {
 		display: block;
