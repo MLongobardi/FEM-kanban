@@ -12,7 +12,7 @@
 
 <style lang="scss">
 	div {
-		background: white;
+		background: var(--background-color);
 		padding: 32px;
 		width: minMaxSize(343px, 480px);
 	}

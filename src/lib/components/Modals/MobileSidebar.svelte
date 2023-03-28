@@ -9,9 +9,6 @@
 
 <style>
     div {
-        background: white;
-    }
-    :global(.dark) div {
-        background: var(--dark-grey)
+        background: var(--background-color);
     }
 </style>

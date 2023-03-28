@@ -20,6 +20,14 @@
 	--loading-text-color: black;
 }
 
+@media (prefers-color-scheme: dark) {
+	:root,
+	::backdrop {
+		--loading-background-color: black;
+		--loading-text-color: white;
+	}
+}
+
 %heading-1,
 %heading-2,
 %heading-3,

@@ -31,6 +31,7 @@
 		background: white;
 		margin-bottom: 20px;
 		box-shadow: 0px 4px 6px rgba(54, 78, 126, 0.101545);
+		background: var(--background-color);
 	}
 	:global(.hoverable) .task-card:hover {
 		cursor: pointer;
@@ -42,9 +43,6 @@
 		margin-top: 4px;
 		margin-bottom: 16px;
 		box-shadow: none;
-	}
-	:global(.dark) .task-card {
-		background: var(--dark-grey);
 	}
 	.task-title {
 		margin-bottom: 8px;

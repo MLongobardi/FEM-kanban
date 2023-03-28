@@ -1,4 +1,5 @@
 <script>
+	import { Select } from "$comps";
 	import { dialogStore, mainStore } from "$stores";
 	import { page } from "$app/stores";
 	import { enhance } from "$app/forms";
@@ -95,13 +96,12 @@
 		</fieldset>
 		<fieldset>
 			<legend>Status</legend>
-			<div class="select-wrap">
-				<select name="status">
-					{#each columns.map((col) => col.name) as c}
-						<option value={c}>{c}</option>
-					{/each}
-				</select>
-			</div>
+			<Select
+				name="status"
+				options={columns.map((col) => ({ value: col.name, label: col.name }))}
+				initial={isAdd ? 0 : columnId}
+				chevron={false}
+			/>
 		</fieldset>
 		<input type="submit" value={isAdd ? "Create Task" : "Save Changes"} />
 	</form>
@@ -109,8 +109,9 @@
 
 <style lang="scss">
 	.subtask-holder {
+		--max-lines: 3;
 		padding: 1px;
-		max-height: 200px;
+		max-height: calc(48px * var(--max-lines));
 		overflow-y: auto;
 	}
 

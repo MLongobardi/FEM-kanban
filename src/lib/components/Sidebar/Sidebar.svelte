@@ -36,16 +36,11 @@
 		width: var(--width);
 		padding: $verticalPadding 0 $verticalPadding 0;
 		box-sizing: border-box;
-		border-right: solid 1px var(--lines-light);
+		background: var(--background-color);
+		border-right: solid 1px var(--lines-color);
 		white-space: nowrap;
 		height: 100%;
 		--left: #{minMaxSize(24px, 32px, 768px, 1440px)};
-		//position: relative;
-		//z-index: 1;
-	}
-	:global(.dark) aside {
-		background: var(--dark-grey);
-		border-right: solid 1px var(--lines-dark);
 	}
 
 	.logo {

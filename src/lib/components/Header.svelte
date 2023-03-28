@@ -78,14 +78,11 @@
 		align-items: center;
 		justify-content: space-between;
 		height: minMaxSize(64px, 80px);
-		border-bottom: solid 1px var(--lines-light);
+		border-bottom: solid 1px var(--lines-color);
+		background: var(--background-color);
 	}
 	:global(.large-tablet) header {
 		height: minMaxSize(80px, 96px, 768px, 1440px);
-	}
-	:global(.dark) header {
-		background: var(--dark-grey);
-		border-color: var(--lines-dark);
 	}
 
 	.left,
@@ -101,10 +98,7 @@
 		box-sizing: border-box;
 		width: 205px;
 		height: 100%;
-		border-right: solid 1px var(--lines-light);
-	}
-	:global(.dark) .logo-holder {
-		border-right: solid 1px var(--lines-dark);
+		border-right: solid 1px var(--lines-color);
 	}
 
 	.logo-holder img, .left > img {
@@ -143,10 +137,7 @@
 		border: none;
 	}
 	:global(.hoverable) .open-menu:hover {
-		background: var(--lines-light);
-	}
-	:global(.dark.hoverable) .open-menu:hover {
-		background: var(--lines-dark);
+		background: var(--lines-color);
 	}
 
 	.header-dropdown {

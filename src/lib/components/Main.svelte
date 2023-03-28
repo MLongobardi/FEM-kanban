@@ -1,6 +1,6 @@
 <script>
 	import { page } from "$app/stores";
-	import { dialogStore, mainStore, mediaStore } from "$stores";
+	import { mainStore, mediaStore } from "$stores";
 	import { TaskCard } from "$comps";
 	import { slide } from "svelte/transition";
 	import { quintOut } from "svelte/easing";
@@ -76,6 +76,7 @@
 	}
 	.column h2 {
 		@extend %heading-4;
+		display: inline-flex;
 		margin-bottom: 24px;
 
 		&::before {

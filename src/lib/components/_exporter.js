@@ -14,3 +14,4 @@ export { default as AddEditBoard } from "src/lib/components/Modals/AddEditBoard.
 export { default as AddEditTask } from "src/lib/components/Modals/AddEditTask.svelte";
 export { default as ModalsPrinter } from "src/lib/components/ModalsPrinter.svelte";
 export { default as TaskCard } from "src/lib/components/TaskCard.svelte";
+export { default as Select } from "src/lib/components/MyLibrary/Select.svelte";
