@@ -43,10 +43,14 @@
 		margin-top: 4px;
 		margin-bottom: 16px;
 		box-shadow: none;
+		& .task-title {
+			color: var(--main-purple);
+		}
 	}
 	.task-title {
 		margin-bottom: 8px;
 	}
+
 	button {
 		@extend %screen-reader-only;
 	}

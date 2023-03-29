@@ -133,10 +133,20 @@ input[type="submit"],
 label:has(input[type="radio"]),
 label:has(input[type="checkbox"]) {
 	user-select: none;
-	transition: background-color 0.25s;
+	--btn-color-var-1: "";
+	--btn-color-hov-1: "";
+	--btn-color-var-2: "";
+	--btn-color-hov-2: "";
 
-	.hoverable &:not(:disabled) {
-		/*Only set on non-mobile devices to avoid the blue flash on tap*/
-		cursor: pointer;
+	&:not(:disabled) {
+		.hoverable & {
+			transition: background-color 0.25s;
+			cursor: pointer; /*Only set on non-mobile devices to avoid the blue flash on tap*/
+		}
+		.hoverable &:hover,
+		&:active {
+			--btn-color-var-1: var(--btn-color-hov-1) !important;
+			--btn-color-var-2: var(--btn-color-hov-2) !important;
+		}
 	}
 }

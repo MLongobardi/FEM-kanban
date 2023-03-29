@@ -12,8 +12,8 @@ export function toggleSidebar(draft) {
 }
 
 export function beforeActionModal(draft, mode, info) {
-	if (draft.currentActionType != "") {
-		console.log("mainStore.beforeActionModal error");
+	if (draft.currentActionType != "" || !["ADD", "EDIT", "VIEW"].includes(mode)) {
+		console.log("mainStore.beforeActionModal error, mode: ", mode);
 		return;
 	}
 	draft.currentActionType = mode;

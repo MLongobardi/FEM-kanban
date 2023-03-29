@@ -31,16 +31,15 @@
     }
 
     button {
+        --btn-color-var-1: var(--main-purple);
+        --btn-color-hov-1: var(--main-purple-hover);
         border: none;
         width: 40px;
         height: 20px;
         border-radius: 12px;
-        background: var(--main-purple);
+        background: var(--btn-color-var-1);
         padding: 3px;
         box-sizing: border-box;
-    }
-    :global(.hoverable) button:hover {
-        background: var(--main-purple-hover);
     }
 
     .sr-only {

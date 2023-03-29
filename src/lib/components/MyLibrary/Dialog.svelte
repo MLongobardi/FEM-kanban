@@ -75,6 +75,7 @@
 					let endTouch = e.changedTouches[0];
 					let endTarget = document.elementFromPoint(endTouch.clientX, endTouch.clientY);
 					if (endTarget == dialog) dialog.myClose("easy");
+					e.preventDefault();
 				},
 				{ once: true }
 			);

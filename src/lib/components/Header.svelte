@@ -1,10 +1,9 @@
 <script>
 	import { page } from "$app/stores";
 	import { mainStore, mediaStore, dialogStore } from "$stores";
+	import { Dropdown } from "$comps";
 	import { slide } from "svelte/transition";
 	import { quintOut } from "svelte/easing";
-
-	let showDropdown = false;
 
 	function reducedSlide(node, options) {
 		if (!$mediaStore.misc.prefersReducedMotion) return slide(node, options);
@@ -15,19 +14,10 @@
 		$dialogStore.ADDEDITTASK.open();
 	}
 
-	function handlePointerUp(e) {
-		if (!showDropdown) document.removeEventListener("pointerup", handlePointerUp);
-		if (!e.target.matches(":is(.header-dropdown, .open-menu, .open-menu *)")) {
-			showDropdown = false;
-			document.removeEventListener("pointerup", handlePointerUp);
-		}
-	}
-
-	function openDropDown() {
-		if (showDropdown) return;
-		showDropdown = true;
-		document.addEventListener("pointerup", handlePointerUp);
-	}
+	const dropButtons = [
+		{text: "Edit Board", func: () => {console.log("Edit Board")}},
+		{text: "Delete Board", func: () => {console.log("Delete Board")}},
+	];
 </script>
 
 <header>
@@ -59,20 +49,15 @@
 				+ Add New Task
 			{/if}
 		</button>
-		<button class="open-menu" on:click={openDropDown}>
-			<img alt="Open this board menu" src="/images/icon-vertical-ellipsis.svg" />
-		</button>
-		{#if showDropdown}
-			<div class="header-dropdown">
-				<button class="edit">Edit board</button>
-				<button class="delete">Delete board</button>
-			</div>
-		{/if}
+		<Dropdown {dropButtons}>
+			<img class="open-menu" alt="Open this board menu" src="/images/icon-vertical-ellipsis.svg" />
+		</Dropdown>
 	</div>
 </header>
 
 <style lang="scss">
 	header {
+		position: relative; //anchor for dropdown
 		grid-area: header;
 		display: flex;
 		align-items: center;
@@ -111,40 +96,56 @@
 
 	.new-task {
 		@extend %heading-3;
-		--horizontal-padding: #{minMaxSize(18px, 25px)};
-		//padding: 0 var(--horizontal-padding);
+		--btn-color-var-1: var(--main-purple);
+		--btn-color-hov-1: var(--main-purple-hover);
 		min-width: minMaxSize(140px, 164px, 550px, 768px);
-		background: var(--main-purple);
+		background: var(--btn-color-var-1);
 		color: white;
 		border: none;
 		border-radius: 24px;
 		height: minMaxSize(32px, 48px);
 	}
-	:global(.hoverable) .new-task:hover {
-		background: var(--main-purple-hover);
-	}
 	.new-task:has(img) {
 		min-width: 48px;
 	}
-
-	.open-menu {
+	
+	.right :global(.dropdown-holder) {
+		position: static;
+	}
+	.right :global(.open-dropdown) {
+		--btn-color-var-1: none;
+		--btn-color-hov-1: var(--lines-color);
 		width: 35px;
 		height: 35px;
 		border-radius: 50%;
 		padding: 0;
 		margin: 0 minMaxSize(1px, 9px);
-		background: none;
+		background: var(--btn-color-var-1);
 		border: none;
 	}
-	:global(.hoverable) .open-menu:hover {
-		background: var(--lines-color);
+	.right :global(.dropdown) {
+		border: none;
+		--width: 192px;
+		--offset: -6px;
+		border-radius: 8px;
+		left: unset;
+		right: 24px;
 	}
+	.right :global(.dropdown-button) {
+		@extend %body-L;
+		--btn-color-var-1: white;
+		--btn-color-hov-1: var(--lines-color);
+		text-align: start;
+		padding: 16px 16px 8px 16px;
+		background: var(--btn-color-var-1);
+		color: var(--medium-grey);
 
-	.header-dropdown {
-		@extend %dropdown;
-		width: 192px;
-		height: 94px;
-		position: absolute;
-		top: 100px;
+		&:last-of-type {
+			color: var(--red);
+			padding: 8px 16px 16px 16px;
+		}
+		:global(.dark) & {
+			background: var(--very-dark-grey);
+		}
 	}
 </style>

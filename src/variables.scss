@@ -101,18 +101,6 @@
 	}
 }
 
-%dropdown {
-	display: flex;
-	flex-direction: column;
-	background: white;
-	border-radius: 8px;
-	color: var(--medium-grey);
-
-	:global(.dark) & {
-		background-color: var(--very-dark-grey);
-	}
-}
-
 %screen-reader-only {
 	/*only visible to screen readers*/
 	border: 0;

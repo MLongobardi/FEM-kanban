@@ -124,7 +124,9 @@
 	}
 
 	.delete-subtask {
-		--cross-url: url("/images/icon-cross.svg");
+		--btn-color-var-1: url("/images/icon-cross.svg");
+		--btn-color-hov-1: url("/images/icon-cross-red.svg");
+		--cross-url: var(--btn-color-var-1);
 		display: block;
 		background: none;
 		border: none;
@@ -135,9 +137,6 @@
 	.delete-subtask::after {
 		content: var(--cross-url);
 	}
-	:global(.hoverable) .delete-subtask:hover {
-		--cross-url: url("/images/icon-cross-red.svg");
-	}
 
 	.sr-only {
 		@extend %screen-reader-only;
@@ -145,34 +144,36 @@
 
 	.add-subtask,
 	input[type="submit"] {
+		--btn-color-var-1: rgba(99, 95, 199, 0.1);
+		--btn-color-hov-1: rgba(99, 95, 199, 0.25);
 		@extend %body-L;
 		width: 100%;
 		border-radius: 20px;
 		border: none;
 		height: 40px;
-		background: rgba(99, 95, 199, 0.1);
+		background: var(--btn-color-var-1);
 		font-weight: inherit;
 		color: var(--main-purple);
 		margin-top: 12px;
 	}
-	:global(.hoverable) .add-subtask:hover {
-		background: rgba(99, 95, 199, 0.25);
-	}
 	:global(.dark) .add-subtask {
-		background: white !important;
+		--btn-color-var-1: white;
+		--btn-color-hov-1: white;
 	}
-
+	
 	input[type="submit"] {
+		--btn-color-var-1: var(--main-purple);
+		--btn-color-hov-1: var(--main-purple-hover);
 		margin-top: 24px;
-		background: var(--main-purple);
 		color: white;
 		transition: opacity 0.3s;
-	}
-	:global(.hoverable) input[type="submit"]:hover {
-		background: var(--main-purple-hover);
 	}
 	form:has(:invalid) input[type="submit"] {
 		pointer-events: none;
 		opacity: 0.3;
+
+		:global(.hoverable) & {
+			cursor: not-allowed;
+		}
 	}
 </style>
