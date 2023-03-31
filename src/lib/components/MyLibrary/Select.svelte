@@ -19,9 +19,10 @@
 	];
 	export let name;
 	export let chevron = true;
-    export let initial = 0;
+	export let initial = 0;
 
 	let select;
+	let holder;
 	let value = options[initial].value; //initialized to first value
 	$: selectedId = options.findIndex((o) => o.value == value);
 	let showDropdown = false;
@@ -81,7 +82,7 @@
 	</select>
 </div>
 {#if $mediaStore.misc.hoverable}
-	<div class="my-select-wrapper" class:chevron aria-hidden="true">
+	<div class="my-select-wrapper" class:chevron aria-hidden="true" bind:this={holder}>
 		<button
 			class="my-select"
 			tabindex="-1"
@@ -107,10 +108,11 @@
 						class:highlighted={i == (lastHovered ?? selectedId)}
 						type="button"
 						on:click={() => {
-                            //also triggers when pressing Enter while having focus
+							//also triggers when pressing Enter while having focus
 							value = options[i].value;
 							lastHovered = null;
 							closeDropdown();
+							holder.dispatchEvent(new CustomEvent("change", { bubbles: true }));
 						}}
 						on:mouseover={() => {
 							lastHovered = i;
@@ -180,21 +182,21 @@
 		border-radius: 8px;
 		background: var(--bg);
 		z-index: 1;
-        max-height: 120px;
-        overflow: auto;
+		max-height: 120px;
+		overflow: auto;
 	}
 
 	.option {
 		display: block;
 		background: var(--bg);
 		border: none;
-        outline: 0;
+		outline: 0;
 		padding: var(--input-padding);
 		margin: 0;
 		width: 100%;
 		text-align: start;
 		user-select: none;
-        color: inherit;
+		color: inherit;
 	}
 	.option.highlighted {
 		background: dodgerblue;

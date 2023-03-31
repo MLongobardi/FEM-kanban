@@ -14,21 +14,21 @@
 	{#if $page.data.boards[$mainStore.currentBoard].columns.length > 0}
 		<div class="columns-holder">
 			{#each $page.data.boards[$mainStore.currentBoard].columns as c, i}
-				{#if c.tasks.length > 0}
-					<section class="column">
-						<h2 style:--dotColor={["#49C4E5", "#8471F2", "#67E2AE"][i]}>{c.name}</h2>
-						{#each c.tasks as t, j}
-							{@const total = t.subtasks.length}
-							{@const completed = t.subtasks.filter((s) => s.isCompleted).length}
-							<TaskCard colId={i} taskId={j} title={t.title} {completed} {total} />
-						{/each}
-					</section>
-				{/if}
+				<section class="column">
+					<h2 style:--dotColor={["#49C4E5", "#8471F2", "#67E2AE"][i]}>{c.name}</h2>
+					{#each c.tasks as t, j}
+						{@const total = t.subtasks.length}
+						{@const completed = t.subtasks.filter((s) => s.isCompleted).length}
+						<TaskCard colId={i} taskId={j} title={t.title} {completed} {total} />
+					{:else}
+						no tasks
+					{/each}
+				</section>
 			{/each}
 			<button class="column"><span>+ New Column</span></button>
 		</div>
 	{:else}
-	NO TASKS<!--temp-->
+		NO TASKS<!--temp-->
 	{/if}
 
 	{#if $mediaStore.currentScreen != "mobile"}

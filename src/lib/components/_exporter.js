@@ -16,3 +16,4 @@ export { default as ModalsPrinter } from "src/lib/components/ModalsPrinter.svelt
 export { default as TaskCard } from "src/lib/components/TaskCard.svelte";
 export { default as Select } from "src/lib/components/MyLibrary/Select.svelte";
 export { default as Dropdown } from "src/lib/components/MyLibrary/Dropdown.svelte";
+export { default as ViewTask } from "src/lib/components/Modals/ViewTask.svelte";

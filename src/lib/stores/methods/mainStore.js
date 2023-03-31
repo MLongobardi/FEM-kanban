@@ -17,7 +17,7 @@ export function beforeActionModal(draft, mode, info) {
 		return;
 	}
 	draft.currentActionType = mode;
-	if (mode == "EDIT") {
+	if (mode == "EDIT" || mode == "VIEW") {
 		draft.currentTaskInEdit.columnId = info[0];
 		draft.currentTaskInEdit.taskId = info[1];
 	}

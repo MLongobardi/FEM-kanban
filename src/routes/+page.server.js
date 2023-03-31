@@ -21,6 +21,7 @@ export const actions = {
 
 	editTask: async ({ request }) => {
 		const data = processTaskData(await request.formData());
+		if (!data.subtasks) data.subtasks = [];
 		const newTask = {
 			title: data.title,
 			description: data.description,
@@ -28,25 +29,34 @@ export const actions = {
 		};
 		db.editTask("test", data.taskInfo, newTask, data.subtasks);
 	},
+
+	editTaskInView: async ({ request }) => {
+		const data = processTaskData(await request.formData());
+		if (!data.completedSubtasks) data.completedSubtasks = [];
+		db.editTaskInView("test", data.taskInfo, data.completedSubtasks, data.status);
+	}
 };
 
 const expectedKeys = {
-	task: ["taskInfo", "title", "description", "subtasks", "status"],
+	task: ["taskInfo", "title", "description", "subtasks", "status", "isCompleted"],
 };
 
 function processTaskData(preData) {
 	const data = {};
-	data.subtasks = [];
 
 	for (let [key, value] of preData) {
 		if (!expectedKeys.task.includes(key)) continue;
 		if (key == "subtasks") {
+			if (!data.subtasks) data.subtasks = [];
 			if (!!value && !data[key].includes(value)) data[key] = data[key].concat(value);
 		} else if (key == "taskInfo") data[key] = value.split(",");
-		else data[key] = value;
+		else if (key == "isCompleted") {
+			if (!data.completedSubtasks) data.completedSubtasks = [];
+			data.completedSubtasks = data.completedSubtasks.concat(value);
+		} else data[key] = value;
 	}
 
-	data.subtasks = data.subtasks.map((s) => ({ title: s, isCompleted: false }));
+	if (data.subtasks) data.subtasks = data.subtasks.map((s) => ({ title: s, isCompleted: false }));
 
 	return data;
 }

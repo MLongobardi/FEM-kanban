@@ -15,8 +15,18 @@
 	}
 
 	const dropButtons = [
-		{text: "Edit Board", func: () => {console.log("Edit Board")}},
-		{text: "Delete Board", func: () => {console.log("Delete Board")}},
+		{
+			text: "Edit Board",
+			func: () => {
+				console.log("Edit Board");
+			},
+		},
+		{
+			text: "Delete Board",
+			func: () => {
+				console.log("Delete Board");
+			},
+		},
 	];
 </script>
 
@@ -37,7 +47,7 @@
 		<h1>{$page.data.boards[$mainStore.currentBoard].name}</h1>
 		{#if $mediaStore.currentScreen == "mobile"}
 			<button on:click={$dialogStore.MOBILESIDEBAR.open}>
-				<img alt="Open mobile sidebar" src="/images/icon-chevron-down.svg"/>
+				<img alt="Open mobile sidebar" src="/images/icon-chevron-down.svg" />
 			</button>
 		{/if}
 	</div>
@@ -86,7 +96,8 @@
 		border-right: solid 1px var(--lines-color);
 	}
 
-	.logo-holder img, .left > img {
+	.logo-holder img,
+	.left > img {
 		margin-left: minMaxSize(16px, 24px);
 	}
 
@@ -108,44 +119,17 @@
 	.new-task:has(img) {
 		min-width: 48px;
 	}
-	
+
+	.right :global(.open-dropdown) {
+		margin: 0 minMaxSize(1px, 9px);
+	}
+
 	.right :global(.dropdown-holder) {
 		position: static;
 	}
-	.right :global(.open-dropdown) {
-		--btn-color-var-1: none;
-		--btn-color-hov-1: var(--lines-color);
-		width: 35px;
-		height: 35px;
-		border-radius: 50%;
-		padding: 0;
-		margin: 0 minMaxSize(1px, 9px);
-		background: var(--btn-color-var-1);
-		border: none;
-	}
 	.right :global(.dropdown) {
-		border: none;
-		--width: 192px;
 		--offset: -6px;
-		border-radius: 8px;
 		left: unset;
 		right: 24px;
-	}
-	.right :global(.dropdown-button) {
-		@extend %body-L;
-		--btn-color-var-1: white;
-		--btn-color-hov-1: var(--lines-color);
-		text-align: start;
-		padding: 16px 16px 8px 16px;
-		background: var(--btn-color-var-1);
-		color: var(--medium-grey);
-
-		&:last-of-type {
-			color: var(--red);
-			padding: 8px 16px 16px 16px;
-		}
-		:global(.dark) & {
-			background: var(--very-dark-grey);
-		}
 	}
 </style>

@@ -47,3 +47,18 @@ export function editTask(userid, taskInfo, newTask, subtasks) {
 	//delete old task and add new?
 	db.set(userid, data);
 }
+
+export function editTaskInView(userid, taskInfo, completedSubtasks, status) {
+	const [boardId, columnId, taskId] = taskInfo;
+	const data = db.get(userid);
+	
+	let task = data.boards[boardId].columns[columnId].tasks[taskId];
+	task.status = status;
+	task.subtasks = task.subtasks.map((s) => ({
+		title: s.title,
+		isCompleted: completedSubtasks.includes(s.title),
+	}));
+	data.boards[boardId].columns[columnId].tasks[taskId] = task;
+
+	db.set(userid, data);
+}

@@ -1,5 +1,5 @@
 <script>
-	import { Dialog, AddEditBoard, AddEditTask, MobileSidebar } from "$comps";
+	import { Dialog, AddEditBoard, AddEditTask, ViewTask, MobileSidebar } from "$comps";
 	import { mainStore, mediaStore } from "$stores";
 </script>
 
@@ -8,6 +8,12 @@
 </Dialog>
 <Dialog name="ADDEDITTASK" onClose={mainStore.afterActionModal}>
 	<AddEditTask />
+</Dialog>
+<Dialog name="VIEWTASK" onClose={mainStore.afterActionModal}>
+	<ViewTask />
+</Dialog>
+<Dialog name="DELETETASKBOARD" onClose={mainStore.afterActionModal}>
+	<!--<DeleteTaskBoard />-->
 </Dialog>
 {#if $mediaStore.currentScreen == "mobile"}
 	<Dialog name="MOBILESIDEBAR">

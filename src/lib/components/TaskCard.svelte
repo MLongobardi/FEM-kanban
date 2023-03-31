@@ -8,8 +8,10 @@
 	}
 
 	function handleClick() {
-		mainStore.beforeActionModal("EDIT", [colId, taskId]);
-		$dialogStore.ADDEDITTASK.open();
+		//mainStore.beforeActionModal("EDIT", [colId, taskId]);
+		//$dialogStore.ADDEDITTASK.open();
+		mainStore.beforeActionModal("VIEW", [colId, taskId]);
+		$dialogStore.VIEWTASK.open();
 	}
 </script>
 

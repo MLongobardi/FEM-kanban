@@ -25,7 +25,7 @@
 	function removeSubtask(id) {
 		subtasks = [...subtasks.slice(0, id), ...subtasks.slice(id + 1)];
 	}
-
+	
 	function testEnhance() {
 		let timeId = isAdd ? "addTask" : "editTask";
 		console.time(timeId);
@@ -160,7 +160,7 @@
 		--btn-color-var-1: white;
 		--btn-color-hov-1: white;
 	}
-	
+
 	input[type="submit"] {
 		--btn-color-var-1: var(--main-purple);
 		--btn-color-hov-1: var(--main-purple-hover);
