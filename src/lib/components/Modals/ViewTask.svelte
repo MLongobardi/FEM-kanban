@@ -11,12 +11,12 @@
 	let columnId = $mainStore.currentTaskInEdit.columnId;
 	let taskId = $mainStore.currentTaskInEdit.taskId;
 	let task = $page.data.boards[$mainStore.currentBoard].columns[columnId].tasks[taskId];
-    $: task = $page.data.boards[$mainStore.currentBoard].columns[columnId].tasks[taskId];
-    
-    let useOptimistic = false;
-    const optimisticUI = task.subtasks.map((s)=>({isCompleted: s.isCompleted}));
+	$: task = $page.data.boards[$mainStore.currentBoard].columns[columnId].tasks[taskId];
 
-    $: total = task.subtasks.length;
+	let useOptimistic = false;
+	const optimisticUI = task.subtasks.map((s) => ({ isCompleted: s.isCompleted }));
+
+	$: total = task.subtasks.length;
 	$: completed = (useOptimistic ? optimisticUI : task.subtasks).filter((s) => s.isCompleted).length;
 
 	const dropButtons = [
@@ -31,12 +31,9 @@
 		{
 			text: "Delete Task",
 			func: () => {
-				console.log("Delete Task");
-				/*
                 $dialogStore.VIEWTASK.close();
-				//mainStore.beforeActionModal("EDIT", [columnId, taskId]);
+				mainStore.beforeActionModal("DELETETASK", [columnId, taskId]);
 				$dialogStore.DELETETASKBOARD.open();
-                */
 			},
 		},
 	];
@@ -74,10 +71,9 @@
 			debouncedSubmit.deb(this);
 		}}
 		use:enhance={({ data }) => {
-
 			return async ({ update }) => {
 				await update({ reset: false });
-                useOptimistic = false;
+				useOptimistic = false;
 			};
 		}}
 	>
@@ -86,7 +82,16 @@
 			<legend>Subtasks ({completed} of {total})</legend>
 			{#each task.subtasks as s, i}
 				<label>
-					<input type="checkbox" checked={s.isCompleted} name="isCompleted" value={s.title} on:change={()=>{optimisticUI[i].isCompleted = !optimisticUI[i].isCompleted; useOptimistic = true;}}/>
+					<input
+						type="checkbox"
+						checked={s.isCompleted}
+						name="isCompleted"
+						value={s.title}
+						on:change={() => {
+							optimisticUI[i].isCompleted = !optimisticUI[i].isCompleted;
+							useOptimistic = true;
+						}}
+					/>
 					{s.title}
 				</label>
 			{/each}
@@ -107,23 +112,94 @@
 </div>
 
 <style lang="scss">
-	.header,
-	.subtasks {
+	.header {
 		display: flex;
+		align-items: center;
 	}
 	.header h2 {
 		flex-grow: 1;
 	}
 
-	div :global(.open-dropdown) {
+	div :global(.dropdown-holder) {
 		margin-right: -17.5px;
 	}
 
 	p {
 		@extend %body-L;
+		color: var(--medium-grey);
+		margin: 24px 0;
 	}
 
 	.subtasks {
+		display: flex;
 		flex-direction: column;
+	}
+	.subtasks legend {
+		margin-bottom: 16px;
+	}
+
+	input {
+		position: absolute;
+		opacity: 0;
+	}
+
+	label {
+		
+		display: flex;
+		align-items: center;
+		background: var(--light-grey);
+		border-radius: 4px;
+		padding: 12px;
+		margin-bottom: 8px;
+		color: var(--black);
+
+		:global(.dark) & {
+			color: white;
+		}
+	}
+	label:has(input:checked) {
+		text-decoration: line-through;
+		color: rgba(0, 1, 18, 0.5);
+
+		:global(.dark) & {
+			color: rgba(225, 225, 225, 0.5);
+		}
+	}
+	label::before {
+		position: relative;
+		z-index: 1; //cover real checkbox
+		content: "";
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		border-radius: 2px;
+		width: 16px;
+		height: 16px;
+		margin-right: 16px;
+		flex-shrink: 0;
+		box-sizing: border-box;
+		border: solid 1px rgba(130, 143, 163, 0.248914);
+		background: white;
+
+		:global(.dark) & {
+			background: var(--dark-grey);
+		}
+	}
+	label:has(input:focus-visible)::before {
+		outline:auto;
+	}
+	label:has(input:checked)::before {
+		content: url("/images/icon-check.svg");
+		border: none;
+		background: var(--main-purple);
+	}
+	label:last-of-type {
+		margin: 0;
+	}
+	:global(.dark) label {
+		background: var(--very-dark-grey);
+	}
+	:global(.hoverable) label:hover {
+		background: rgba(99, 95, 199, 0.25);
 	}
 </style>

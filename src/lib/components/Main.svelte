@@ -8,9 +8,10 @@
 	function reducedSlide(node, options) {
 		if (!$mediaStore.misc.prefersReducedMotion) return slide(node, options);
 	}
+	let main;
 </script>
 
-<main>
+<main bind:this={main}>
 	{#if $page.data.boards[$mainStore.currentBoard].columns.length > 0}
 		<div class="columns-holder">
 			{#each $page.data.boards[$mainStore.currentBoard].columns as c, i}
@@ -19,7 +20,7 @@
 					{#each c.tasks as t, j}
 						{@const total = t.subtasks.length}
 						{@const completed = t.subtasks.filter((s) => s.isCompleted).length}
-						<TaskCard colId={i} taskId={j} title={t.title} {completed} {total} />
+						<TaskCard colId={i} taskId={j} title={t.title} {completed} {total} {main}/>
 					{:else}
 						no tasks
 					{/each}
@@ -60,6 +61,8 @@
 		display: flex;
 		height: max-content;
 		min-height: 87%;
+		padding-top: 24px;
+		padding-left: 12px;
 	}
 
 	.show-sidebar {
@@ -85,6 +88,7 @@
 		flex-shrink: 0;
 		margin-top: 24px;
 		margin-left: 24px;
+		margin: 0 12px 0 12px;
 		display: flex; //prevents margins collapsing, so that the .task-card:active effect works
 		flex-direction: column;
 	}

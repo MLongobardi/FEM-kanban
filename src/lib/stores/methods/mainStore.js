@@ -12,12 +12,12 @@ export function toggleSidebar(draft) {
 }
 
 export function beforeActionModal(draft, mode, info) {
-	if (draft.currentActionType != "" || !["ADD", "EDIT", "VIEW"].includes(mode)) {
+	if (draft.currentActionType != "" || !["ADD", "EDIT", "VIEW", "DELETETASK", "DELETEBOARD"].includes(mode)) {
 		console.log("mainStore.beforeActionModal error, mode: ", mode);
 		return;
 	}
 	draft.currentActionType = mode;
-	if (mode == "EDIT" || mode == "VIEW") {
+	if (mode == "EDIT" || mode == "VIEW" || mode == "DELETETASK") {
 		draft.currentTaskInEdit.columnId = info[0];
 		draft.currentTaskInEdit.taskId = info[1];
 	}

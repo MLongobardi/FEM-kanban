@@ -14,7 +14,7 @@
 	 * to close it
 	 *
 	 * A Dialog instance won't be added to the dialogStore if it isn't given a name prop.
-	 * 
+	 *
 	 * The dialog's content will only be printed when the dialog is open.
 	 *
 	 * The dialog backdrop doesn't inherit anything, so it can only use css variables declared in ::backdrop
@@ -83,7 +83,7 @@
 			dialog.addEventListener(
 				"pointerup",
 				(e) => {
-					if (e.target == dialog) dialog.myClose("easy");
+					if (e.target == dialog && e.button == 0) dialog.myClose("easy");
 				},
 				{ once: true }
 			);
@@ -128,7 +128,7 @@
 		width: 100%;
 		border-radius: inherit;
 	}
-	
+
 	:global(body):has(dialog[open]) {
 		overflow: hidden;
 	}

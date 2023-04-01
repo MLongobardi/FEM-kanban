@@ -75,6 +75,10 @@ dialog > div :is(input[type="text"], textarea, .my-select, .option) {
 	}
 }
 
+.dark .option {
+	color: var(--medium-grey) !important;
+}
+
 .my-select-wrapper::after {
 	content: url("/images/icon-chevron-down.svg");
 	display: block;
