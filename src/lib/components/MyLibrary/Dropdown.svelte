@@ -35,6 +35,7 @@
 		display: none;
 		width: var(--width);
 		position: absolute;
+		z-index: 1;
 		border: solid 1px #E8E8E8;
 		border-radius: 0 0 8px 8px;
 		overflow: hidden;

@@ -1,13 +1,10 @@
 <script>
-	import { Dialog, AddEditBoard, AddEditTask, ViewTask, DeleteTaskBoard, MobileSidebar } from "$comps";
+	import { Dialog, AddEditTaskBoard, ViewTask, DeleteTaskBoard, MobileSidebar } from "$comps";
 	import { mainStore, mediaStore } from "$stores";
 </script>
 
-<Dialog name="ADDEDITBOARD" onClose={mainStore.afterActionModal}>
-	<AddEditBoard />
-</Dialog>
-<Dialog name="ADDEDITTASK" onClose={mainStore.afterActionModal}>
-	<AddEditTask />
+<Dialog name="ADDEDITTASKBOARD" onClose={mainStore.afterActionModal}>
+	<AddEditTaskBoard />
 </Dialog>
 <Dialog name="VIEWTASK" onClose={mainStore.afterActionModal}>
 	<ViewTask />

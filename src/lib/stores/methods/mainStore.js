@@ -11,23 +11,32 @@ export function toggleSidebar(draft) {
 	draft.showSidebarOnBigScreen = !draft.showSidebarOnBigScreen;
 }
 
-export function beforeActionModal(draft, mode, info) {
-	if (draft.currentActionType != "" || !["ADD", "EDIT", "VIEW", "DELETETASK", "DELETEBOARD"].includes(mode)) {
-		console.log("mainStore.beforeActionModal error, mode: ", mode);
+export function beforeActionModal(draft, target, mode, info) {
+	if (
+		draft.currentActionTarget != "" ||
+		draft.currentActionType != "" ||
+		!["TASK", "BOARD"].includes(target) ||
+		!["ADD", "EDIT", "VIEW", "DELETE"].includes(mode)
+	) {
+		console.log("mainStore.beforeActionModal error, target: ", target, " mode: ", mode);
 		return;
 	}
+
+	draft.currentActionTarget = target;
 	draft.currentActionType = mode;
-	if (mode == "EDIT" || mode == "VIEW" || mode == "DELETETASK") {
+	if (target == "TASK" && ["EDIT", "VIEW", "DELETE"].includes(mode)) {
 		draft.currentTaskInEdit.columnId = info[0];
 		draft.currentTaskInEdit.taskId = info[1];
 	}
 }
 
 export function afterActionModal(draft) {
-	if (draft.currentActionType == "") {
+	if (draft.currentActionTarget == "" || draft.currentActionType == "") {
 		console.log("mainStore.afterActionModal error");
 		return;
 	}
+
+	draft.currentActionTarget = "";
 	draft.currentActionType = "";
 	draft.currentTaskInEdit.columnId = null;
 	draft.currentTaskInEdit.taskId = null;

@@ -9,22 +9,24 @@
 		if (!$mediaStore.misc.prefersReducedMotion) return slide(node, options);
 	}
 
-	function openModal() {
-		mainStore.beforeActionModal("ADD");
-		$dialogStore.ADDEDITTASK.open();
+	function handleNewTask() {
+		mainStore.beforeActionModal("TASK","ADD");
+		$dialogStore.ADDEDITTASKBOARD.open();
 	}
 
 	const dropButtons = [
 		{
 			text: "Edit Board",
 			func: () => {
-				console.log("Edit Board");
+				mainStore.beforeActionModal("BOARD","EDIT");
+				$dialogStore.ADDEDITTASKBOARD.open();
 			},
 		},
 		{
 			text: "Delete Board",
 			func: () => {
-				console.log("Delete Board");
+				mainStore.beforeActionModal("BOARD","DELETE");
+				$dialogStore.DELETETASKBOARD.open();
 			},
 		},
 	];
@@ -52,7 +54,7 @@
 		{/if}
 	</div>
 	<div class="right">
-		<button class="new-task" on:click={openModal}>
+		<button class="new-task" on:click={handleNewTask}>
 			{#if $mediaStore.currentScreen == "mobile"}
 				<img alt="add task" src="/images/icon-add-task-mobile.svg" />
 			{:else}

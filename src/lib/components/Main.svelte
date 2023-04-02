@@ -1,14 +1,19 @@
 <script>
 	import { page } from "$app/stores";
-	import { mainStore, mediaStore } from "$stores";
+	import { dialogStore, mainStore, mediaStore } from "$stores";
 	import { TaskCard } from "$comps";
 	import { slide } from "svelte/transition";
 	import { quintOut } from "svelte/easing";
-
+	
 	function reducedSlide(node, options) {
 		if (!$mediaStore.misc.prefersReducedMotion) return slide(node, options);
 	}
 	let main;
+
+	function handleNewColumn() {
+		mainStore.beforeActionModal("BOARD","EDIT");
+		$dialogStore.ADDEDITTASKBOARD.open();
+	}
 </script>
 
 <main bind:this={main}>
@@ -16,7 +21,7 @@
 		<div class="columns-holder">
 			{#each $page.data.boards[$mainStore.currentBoard].columns as c, i}
 				<section class="column">
-					<h2 style:--dotColor={["#49C4E5", "#8471F2", "#67E2AE"][i]}>{c.name}</h2>
+					<h2 style:--dotColor={["#49C4E5", "#8471F2", "#67E2AE"][i]}>{c.name} ({c.tasks.length})</h2>
 					{#each c.tasks as t, j}
 						{@const total = t.subtasks.length}
 						{@const completed = t.subtasks.filter((s) => s.isCompleted).length}
@@ -26,7 +31,7 @@
 					{/each}
 				</section>
 			{/each}
-			<button class="column"><span>+ New Column</span></button>
+			<button class="column" on:click={handleNewColumn}><span>+ New Column</span></button>
 		</div>
 	{:else}
 		NO TASKS<!--temp-->
@@ -114,7 +119,7 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		margin-top: 63.12px; //24px + 24px + 12px * 1.26
+		margin-top: 39.12px; //24px + 12px * 1.26
 		margin-right: 24px;
 		border-radius: 6px;
 		border: none;

@@ -4,16 +4,16 @@ const db = new Map();
 
 db.set("test", testData);
 
-export function getData(userid) {
-	return db.get(userid);
+export function getData(userId) {
+	return db.get(userId);
 }
 
-export function addTask(userid, boardId, newTask) {
-	if (!db.has(userid)) {
-		db.set(userid, {});
+export function addTask(userId, boardId, newTask) {
+	if (!db.has(userId)) {
+		db.set(userId, {});
 	}
 
-	const data = db.get(userid);
+	const data = db.get(userId);
 	let columnId = data.boards[boardId].columns.findIndex((column) => column.name == newTask.status);
 	if (columnId == -1) {
 		//create new column and add newTask to it?
@@ -22,16 +22,16 @@ export function addTask(userid, boardId, newTask) {
 		data.boards[boardId].columns[columnId].tasks.push(newTask);
 	}
 
-	db.set(userid, data);
+	db.set(userId, data);
 }
 
-export function editTask(userid, taskInfo, newTask, subtasks) {
-	if (!db.has(userid)) {
-		db.set(userid, {});
+export function editTask(userId, taskInfo, newTask, subtasks) {
+	if (!db.has(userId)) {
+		db.set(userId, {});
 	}
 
 	const [boardId, columnId, taskId] = taskInfo;
-	const data = db.get(userid);
+	const data = db.get(userId);
 
 	let oldSubtasks = data.boards[boardId].columns[columnId].tasks[taskId].subtasks;
 	subtasks = subtasks.map((s) => {
@@ -45,13 +45,13 @@ export function editTask(userid, taskInfo, newTask, subtasks) {
 	data.boards[boardId].columns[columnId].tasks[taskId] = newTask;
 	//else
 	//delete old task and add new?
-	db.set(userid, data);
+	db.set(userId, data);
 }
 
-export function editTaskInView(userid, taskInfo, completedSubtasks, status) {
+export function editTaskInView(userId, taskInfo, completedSubtasks, status) {
 	const [boardId, columnId, taskId] = taskInfo;
-	const data = db.get(userid);
-	
+	const data = db.get(userId);
+
 	let task = data.boards[boardId].columns[columnId].tasks[taskId];
 	task.status = status;
 	task.subtasks = task.subtasks.map((s) => ({
@@ -60,5 +60,31 @@ export function editTaskInView(userid, taskInfo, completedSubtasks, status) {
 	}));
 	data.boards[boardId].columns[columnId].tasks[taskId] = task;
 
-	db.set(userid, data);
+	db.set(userId, data);
+}
+
+export function deleteTask(userId, taskInfo) {
+	const [boardId, columnId, taskId] = taskInfo;
+	const data = db.get(userId);
+	data.boards[boardId].columns[columnId].tasks.splice(taskId, 1);
+
+	db.set(userId, data);
+}
+
+export function addBoard(userId, newBoard) {
+	const data = db.get(userId);
+	data.boards.push(newBoard);
+
+	db.set(userId, data);
+}
+
+export function editBoard(userId) {
+	console.log(userId)
+}
+
+export function deleteBoard(userId, boardId) {
+	const data = db.get(userId);
+	data.boards.splice(boardId, 1);
+
+	db.set(userId, data);
 }

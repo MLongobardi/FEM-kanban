@@ -4,7 +4,8 @@ import * as mainStoreMethods from "./methods/mainStore.js";
 
 const startObject = {
 	currentBoard: 0,
-	currentActionType: "", //"ADD" | "EDIT" | "VIEW" | "DELETETASK" | "DELETEBOARD" | ""
+	currentActionTarget: "", //"BOARD" | "TASK" | ""
+	currentActionType: "", //"ADD" | "EDIT" | "VIEW" | "DELETE" | "DELETE" | ""
 	currentTaskInEdit: {
 		columnId: null,
 		taskId: null,

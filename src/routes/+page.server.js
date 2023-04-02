@@ -9,7 +9,7 @@ export function load() {
 export const actions = {
 	addTask: async ({ request }) => {
 		//await new Promise((fulfil) => setTimeout(fulfil, 1200)); //test delay
-		const data = processTaskData(await request.formData());
+		const data = processData(await request.formData(), "TASK");
 		const newTask = {
 			title: data.title,
 			description: data.description,
@@ -20,7 +20,7 @@ export const actions = {
 	},
 
 	editTask: async ({ request }) => {
-		const data = processTaskData(await request.formData());
+		const data = processData(await request.formData(), "TASK");
 		if (!data.subtasks) data.subtasks = [];
 		const newTask = {
 			title: data.title,
@@ -31,23 +31,48 @@ export const actions = {
 	},
 
 	editTaskInView: async ({ request }) => {
-		const data = processTaskData(await request.formData());
+		const data = processData(await request.formData(), "TASK");
 		if (!data.completedSubtasks) data.completedSubtasks = [];
 		db.editTaskInView("test", data.taskInfo, data.completedSubtasks, data.status);
-	}
+	},
+
+	deleteTask: async ({ request }) => {
+		const data = processData(await request.formData(), "TASK");
+		db.deleteTask("test", data.taskInfo);
+	},
+
+	addBoard: async ({ request }) => {
+		const data = processData(await request.formData(), "BOARD");
+		const newBoard = {
+			name: data.name,
+			columns: data.columns,
+		};
+		db.addBoard("test", newBoard);
+	},
+
+	editBoard: async ({ request }) => {
+		const data = processData(await request.formData(), "BOARD");
+		console.log("test", data);
+	},
+
+	deleteBoard: async ({ request }) => {
+		const data = processData(await request.formData(), "BOARD");
+		db.deleteBoard("test", data.boardId);
+	},
 };
 
 const expectedKeys = {
-	task: ["taskInfo", "title", "description", "subtasks", "status", "isCompleted"],
+	TASK: ["taskInfo", "title", "description", "subtasks", "status", "isCompleted"],
+	BOARD: ["boardId", "name", "columns"],
 };
 
-function processTaskData(preData) {
+function processData(preData, type) {
 	const data = {};
 
 	for (let [key, value] of preData) {
-		if (!expectedKeys.task.includes(key)) continue;
-		if (key == "subtasks") {
-			if (!data.subtasks) data.subtasks = [];
+		if (!expectedKeys[type].includes(key)) continue;
+		if (key == "subtasks" || key == "columns") {
+			if (!data[key]) data[key] = [];
 			if (!!value && !data[key].includes(value)) data[key] = data[key].concat(value);
 		} else if (key == "taskInfo") data[key] = value.split(",");
 		else if (key == "isCompleted") {
@@ -57,6 +82,7 @@ function processTaskData(preData) {
 	}
 
 	if (data.subtasks) data.subtasks = data.subtasks.map((s) => ({ title: s, isCompleted: false }));
+	if (data.columns) data.columns = data.columns.map((c) => ({ name: c, tasks: [] }));
 
 	return data;
 }

@@ -24,15 +24,15 @@
 			text: "Edit Task",
 			func: () => {
 				$dialogStore.VIEWTASK.close();
-				mainStore.beforeActionModal("EDIT", [columnId, taskId]);
-				$dialogStore.ADDEDITTASK.open();
+				mainStore.beforeActionModal("TASK", "EDIT", [columnId, taskId]);
+				$dialogStore.ADDEDITTASKBOARD.open();
 			},
 		},
 		{
 			text: "Delete Task",
 			func: () => {
                 $dialogStore.VIEWTASK.close();
-				mainStore.beforeActionModal("DELETETASK", [columnId, taskId]);
+				mainStore.beforeActionModal("TASK", "DELETE", [columnId, taskId]);
 				$dialogStore.DELETETASKBOARD.open();
 			},
 		},
@@ -70,7 +70,7 @@
 		on:change={function () {
 			debouncedSubmit.deb(this);
 		}}
-		use:enhance={({ data }) => {
+		use:enhance={() => {
 			return async ({ update }) => {
 				await update({ reset: false });
 				useOptimistic = false;

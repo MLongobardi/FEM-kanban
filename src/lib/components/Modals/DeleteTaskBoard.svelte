@@ -1,8 +1,9 @@
 <script>
 	import { dialogStore, mainStore } from "$stores";
 	import { page } from "$app/stores";
+	import { enhance } from "$app/forms";
 
-	let isTask = $mainStore.currentActionType == "DELETETASK";
+	let isTask = $mainStore.currentActionTarget == "TASK";
 	let task, columnId, taskId;
 	let board = $page.data.boards[$mainStore.currentBoard];
 	if (isTask) {
@@ -26,10 +27,20 @@
 
 	<form
 		method="POST"
-		on:submit|preventDefault={() => {
-			console.log("delete submit");
+		action={isTask ? "?/deleteTask" : "?/deleteBoard"}
+		use:enhance={() => {
+			return async ({ update }) => {
+				if (!isTask) mainStore.setBoard(Math.max(0, $mainStore.currentBoard - 1));
+				await update();
+				$dialogStore.DELETETASKBOARD.close();
+			};
 		}}
 	>
+		{#if isTask}
+			<input type="hidden" name="taskInfo" value={[$mainStore.currentBoard, columnId, taskId]} />
+		{:else}
+			<input type="hidden" name="boardId" value={$mainStore.currentBoard} />
+		{/if}
 		<input type="submit" value="Delete" />
 		<button type="button" on:click={$dialogStore.DELETETASKBOARD.close}>Cancel</button>
 	</form>

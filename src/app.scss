@@ -157,7 +157,7 @@ textarea {
 		padding: 8px 16px 16px 16px;
 	}
 	.dark & {
-		background: var(--very-dark-grey);
+		--btn-color-var-1: var(--very-dark-grey);
 	}
 }
 

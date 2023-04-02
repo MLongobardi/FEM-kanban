@@ -10,11 +10,10 @@ export { default as BoardList } from "src/lib/components/Sidebar/BoardList.svelt
 export { default as Dialog } from "src/lib/components/MyLibrary/Dialog.svelte";
 export { default as Loading } from "src/lib/components/MyLibrary/Loading.svelte";
 export { default as MobileSidebar } from "src/lib/components/Modals/MobileSidebar.svelte";
-export { default as AddEditBoard } from "src/lib/components/Modals/AddEditBoard.svelte";
-export { default as AddEditTask } from "src/lib/components/Modals/AddEditTask.svelte";
 export { default as ModalsPrinter } from "src/lib/components/ModalsPrinter.svelte";
 export { default as TaskCard } from "src/lib/components/TaskCard.svelte";
 export { default as Select } from "src/lib/components/MyLibrary/Select.svelte";
 export { default as Dropdown } from "src/lib/components/MyLibrary/Dropdown.svelte";
 export { default as ViewTask } from "src/lib/components/Modals/ViewTask.svelte";
 export { default as DeleteTaskBoard } from "src/lib/components/Modals/DeleteTaskBoard.svelte";
+export { default as AddEditTaskBoard } from "src/lib/components/Modals/AddEditTaskBoard.svelte";

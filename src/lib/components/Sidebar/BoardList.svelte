@@ -1,17 +1,29 @@
 <script>
 	import { page } from "$app/stores";
-	import { mainStore } from "$stores";
+	import { dialogStore, mainStore } from "$stores";
+
+	function handleAddBoard() {
+		mainStore.beforeActionModal("BOARD", "ADD");
+		$dialogStore.ADDEDITTASKBOARD.open();
+	}
 </script>
 
 <section>
 	<h4>ALL BOARDS ({$page.data.boards.length})</h4>
 	{#each $page.data.boards as board, i}
 		{@const active = i == $mainStore.currentBoard}
-		<button class="board" class:active disabled={active} on:click={()=>{mainStore.setBoard(i)}}>
+		<button
+			class="board"
+			class:active
+			disabled={active}
+			on:click={() => {
+				mainStore.setBoard(i);
+			}}
+		>
 			<span>{board.name}</span>
 		</button>
 	{/each}
-	<button class="add">
+	<button class="add-board" on:click={handleAddBoard}>
 		<span>+ Create New Board</span>
 	</button>
 </section>
@@ -32,7 +44,7 @@
 		--icon-url-active: url("/images/icon-board-white.svg");
 	}
 
-	.add {
+	.add-board {
 		@extend %strip;
 		--icon-url: url("/images/icon-board-purple.svg");
 		color: var(--main-purple);
