@@ -70,8 +70,9 @@ dialog > div :is(input[type="text"], textarea, .my-select, .option) {
 		color: white;
 	}
 
-	&:invalid:not(:focus-visible) {
+	&:invalid {
 		border-color: var(--red);
+		outline-color: var(--red);
 	}
 }
 

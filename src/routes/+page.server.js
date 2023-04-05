@@ -1,3 +1,4 @@
+import { fail } from "@sveltejs/kit";
 import * as db from "$lib/server/db.js";
 
 export function load() {
@@ -16,7 +17,14 @@ export const actions = {
 			status: data.status,
 			subtasks: data.subtasks,
 		};
-		db.addTask("test", data.taskInfo[0], newTask);
+		try {
+			db.addTask("test", data.taskInfo[0], newTask);
+		} catch (error) {
+			return fail(422, {
+				title: data.title,
+				error: error.message,
+			})
+		}
 	},
 
 	editTask: async ({ request }) => {
@@ -54,7 +62,7 @@ export const actions = {
 	editBoard: async ({ request }) => {
 		const data = processData(await request.formData(), "BOARD");
 		if (!data.columns) data.columns = [];
-		console.log("test", data);
+		db.editBoard("test", data.boardId, data.name, data.columns);
 	},
 
 	deleteBoard: async ({ request }) => {
@@ -73,6 +81,7 @@ function processData(preData, type) {
 
 	for (let [key, value] of preData) {
 		if (!expectedKeys[type].includes(key)) continue;
+		if (typeof value == "string") value = value.trim();
 		if (key == "subtasks" || key == "columns") {
 			if (!data[key]) data[key] = [];
 			if (!!value && !data[key].includes(value)) data[key] = data[key].concat(value);
@@ -83,8 +92,8 @@ function processData(preData, type) {
 		} else data[key] = value;
 	}
 
-	if (data.subtasks) data.subtasks = data.subtasks.map((s) => ({ title: s, isCompleted: false }));
-	if (data.columns) data.columns = data.columns.map((c) => ({ name: c, tasks: [] }));
+	if (data.subtasks) data.subtasks = data.subtasks.map((s) => ({ title: s.trim(), isCompleted: false }));
+	if (data.columns) data.columns = data.columns.map((c) => ({ name: c.trim(), tasks: [] }));
 
 	return data;
 }

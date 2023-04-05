@@ -29,7 +29,7 @@
 </section>
 
 <style lang="scss">
-	section {
+	:global(aside) section {
 		margin-top: 54px;
 	}
 

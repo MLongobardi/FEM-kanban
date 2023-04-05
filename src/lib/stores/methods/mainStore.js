@@ -28,6 +28,9 @@ export function beforeActionModal(draft, target, mode, info) {
 		draft.currentTaskInEdit.columnId = info[0];
 		draft.currentTaskInEdit.taskId = info[1];
 	}
+	if (target == "BOARD" && mode == "EDIT" && info) {
+		draft.immediateNewColumn = true;
+	}
 }
 
 export function afterActionModal(draft) {
@@ -40,4 +43,5 @@ export function afterActionModal(draft) {
 	draft.currentActionType = "";
 	draft.currentTaskInEdit.columnId = null;
 	draft.currentTaskInEdit.taskId = null;
+	draft.immediateNewColumn = false;
 }

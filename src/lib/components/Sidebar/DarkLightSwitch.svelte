@@ -23,8 +23,11 @@
         background: var(--light-grey);
         border-radius: 6px;
         height: 48px;
-        //A simple margin: auto doesn't behave correctly during the sidebar slide transition
-        margin-left: calc((var(--parentWidth) - var(--thisWidth)) / 2);
+
+        :global(aside) & {
+            //A simple margin: auto doesn't behave correctly during the sidebar slide transition
+            margin-left: calc((var(--parentWidth) - var(--thisWidth)) / 2);
+        }
     }
     :global(.dark) .color-switch {
         background: var(--very-dark-grey);

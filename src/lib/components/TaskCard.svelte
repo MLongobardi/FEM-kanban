@@ -4,7 +4,7 @@
 	import { derived } from "svelte/store";
 	export let colId, taskId, title, completed, total, main//, send, receive, flip;
 	let button,
-		article,
+		card,
 		timeout,
 		mainBoundingRect,
 		dragging = false,
@@ -25,7 +25,7 @@
 			t: 3 + 4, //I don't know why but it needs 4px more
 			b: 3 + 12, //sidebar
 		},
-		delay = 350;
+		delay = 200;
 
 	const coords = spring(
 		{ l: 0, t: 0 },
@@ -39,11 +39,11 @@
 	const boundCoords = derived(coords, ($c) => {
 		let bl = $c.l - offsetX + baseX - scrolledX;
 		let bt = $c.t - offsetY + baseY - scrolledY;
-		if (article && !neverDragged) {
+		if (card && !neverDragged) {
 			bl = Math.max(bl, mainBoundingRect.left + boundOffset.l);
-			bl = Math.min(bl, mainBoundingRect.right - article.offsetWidth - boundOffset.r);
+			bl = Math.min(bl, mainBoundingRect.right - card.offsetWidth - boundOffset.r);
 			bt = Math.max(bt, mainBoundingRect.top + boundOffset.t);
-			bt = Math.min(bt, mainBoundingRect.bottom - article.offsetHeight - boundOffset.b);
+			bt = Math.min(bt, mainBoundingRect.bottom - card.offsetHeight - boundOffset.b);
 		}
 
 		return { l: bl + offsetX - baseX + scrolledX, t: bt + offsetY - baseY + scrolledY };
@@ -84,10 +84,10 @@
 		document.addEventListener("pointerup", handlePointerUp, { once: true });
 		if (!$mediaStore.misc.hoverable) return;
 		mainBoundingRect = main.getBoundingClientRect();
-		if (article.offsetWidth > mainBoundingRect.width - boundOffset.l - boundOffset.r) return;
-		if (article.offsetHeight > mainBoundingRect.height - boundOffset.t - boundOffset.b) return;
+		if (card.offsetWidth > mainBoundingRect.width - boundOffset.l - boundOffset.r) return;
+		if (card.offsetHeight > mainBoundingRect.height - boundOffset.t - boundOffset.b) return;
 		timeout = setTimeout(() => {
-			if (!article.matches(":hover")) return;
+			if (!card.matches(":hover")) return;
 			mainBoundingRect = main.getBoundingClientRect();
 			dragging = true;
 			initialScrollX = main.scrollLeft;
@@ -106,7 +106,7 @@
 	}
 	function handlePointerUp(e) {
 		clearTimeout(timeout);
-		if ((!dragging || neverDragged) && e && e.target == article) redirectClick(e);
+		if ((!dragging || neverDragged) && e && e.target == card) redirectClick(e);
 		dragging = false;
 		neverDragged = true;
 		document.removeEventListener("mousemove", handleDrag);
@@ -124,9 +124,9 @@
 	}
 </script>
 
-<article
+<div
 	class="task-card"
-	bind:this={article}
+	bind:this={card}
 	on:pointerdown={handlePointerDown}
 	on:focusout={abort}
 	class:dragging
@@ -139,7 +139,7 @@
 	</h3>
 	{completed} of {total} subtasks
 	<button bind:this={button} on:click|stopPropagation={handleClick}>View full task info</button>
-</article>
+</div>
 
 <style lang="scss">
 	:global(body):has(.task-card:is(.dragging, :active)) {
@@ -149,7 +149,7 @@
 		cursor: grab;
 
 		& :global(button),
-		& article:not(.dragging) {
+		& div:not(.dragging) {
 			pointer-events: none;
 		}
 	}

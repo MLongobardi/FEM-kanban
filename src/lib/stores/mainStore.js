@@ -10,6 +10,7 @@ const startObject = {
 		columnId: null,
 		taskId: null,
 	},
+	immediateNewColumn: false,
 	darkMode: true,
 	showSidebarOnBigScreen: true,
 };

@@ -10,7 +10,8 @@
 	}
 
 	function handleNewTask() {
-		mainStore.beforeActionModal("TASK","ADD");
+		if ($page.data.boards[$mainStore.currentBoard].columns.length == 0) return;
+		mainStore.beforeActionModal("TASK", "ADD");
 		$dialogStore.ADDEDITTASKBOARD.open();
 	}
 
@@ -18,14 +19,14 @@
 		{
 			text: "Edit Board",
 			func: () => {
-				mainStore.beforeActionModal("BOARD","EDIT");
+				mainStore.beforeActionModal("BOARD", "EDIT");
 				$dialogStore.ADDEDITTASKBOARD.open();
 			},
 		},
 		{
 			text: "Delete Board",
 			func: () => {
-				mainStore.beforeActionModal("BOARD","DELETE");
+				mainStore.beforeActionModal("BOARD", "DELETE");
 				$dialogStore.DELETETASKBOARD.open();
 			},
 		},
@@ -48,13 +49,17 @@
 		{/if}
 		<h1>{$page.data.boards[$mainStore.currentBoard].name}</h1>
 		{#if $mediaStore.currentScreen == "mobile"}
-			<button on:click={$dialogStore.MOBILESIDEBAR.open}>
+			<button class="open-mobile-sidebar" on:click={$dialogStore.MOBILESIDEBAR.open}>
 				<img alt="Open mobile sidebar" src="/images/icon-chevron-down.svg" />
 			</button>
 		{/if}
 	</div>
 	<div class="right">
-		<button class="new-task" on:click={handleNewTask}>
+		<button
+			class="new-task"
+			on:click={handleNewTask}
+			disabled={$page.data.boards[$mainStore.currentBoard].columns.length == 0}
+		>
 			{#if $mediaStore.currentScreen == "mobile"}
 				<img alt="add task" src="/images/icon-add-task-mobile.svg" />
 			{:else}
@@ -107,10 +112,26 @@
 		margin-left: 24px;
 	}
 
+	.open-mobile-sidebar {
+		background: none;
+		border: none;
+		padding: 5px 9px;
+	}
+	.open-mobile-sidebar img {
+		transition: transform 250ms;
+
+		:global(body:has(.mobile-sidebar)) & {
+			transform: rotate(180deg);
+		}
+	}
+
 	.new-task {
 		@extend %add-new-button;
 		min-width: minMaxSize(140px, 164px, 550px, 768px);
 		height: minMaxSize(32px, 48px);
+	}
+	.new-task:disabled {
+		opacity: 0.3;
 	}
 	.new-task:has(img) {
 		min-width: 48px;
