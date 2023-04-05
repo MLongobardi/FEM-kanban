@@ -4,16 +4,39 @@
 	import { TaskCard } from "$comps";
 	import { slide } from "svelte/transition";
 	import { quintOut } from "svelte/easing";
-	
+	import { crossfade } from "svelte/transition";
+	import { flip } from "svelte/animate";
+
 	function reducedSlide(node, options) {
 		if (!$mediaStore.misc.prefersReducedMotion) return slide(node, options);
 	}
 	let main;
 
 	function handleNewColumn() {
-		mainStore.beforeActionModal("BOARD","EDIT");
+		mainStore.beforeActionModal("BOARD", "EDIT");
 		$dialogStore.ADDEDITTASKBOARD.open();
 	}
+
+	const [send, receive] = crossfade({
+		duration: (d) => Math.sqrt(d * 200),
+
+		fallback(node, params) {
+			const style = getComputedStyle(node);
+			const transform = style.transform === "none" ? "" : style.transform;
+
+			return {
+				duration: 600,
+				easing: quintOut,
+				css: (t) => `
+					transform: ${transform} scale(${t});
+					opacity: ${t}
+				`,
+			};
+		},
+	});
+	$: reducedSend = $mediaStore.misc.prefersReducedMotion ? () => {} : send;
+	$: reducedReceive = $mediaStore.misc.prefersReducedMotion ? () => {} : receive;
+	$: reducedFlip = $mediaStore.misc.prefersReducedMotion ? () => {return arguments} : flip;
 </script>
 
 <main bind:this={main}>
@@ -21,11 +44,20 @@
 		<div class="columns-holder">
 			{#each $page.data.boards[$mainStore.currentBoard].columns as c, i}
 				<section class="column">
-					<h2 style:--dotColor={["#49C4E5", "#8471F2", "#67E2AE"][i]}>{c.name} ({c.tasks.length})</h2>
-					{#each c.tasks as t, j}
+					<h2 style:--dotColor={["#49C4E5", "#8471F2", "#67E2AE"][i]}>
+						{c.name} ({c.tasks.length})
+					</h2>
+					{#each c.tasks as t, j (t.title)}
 						{@const total = t.subtasks.length}
 						{@const completed = t.subtasks.filter((s) => s.isCompleted).length}
-						<TaskCard colId={i} taskId={j} title={t.title} {completed} {total} {main}/>
+						<div
+							class="task-holder"
+							in:reducedReceive={{ key: t.title }}
+							out:reducedSend={{ key: t.title }}
+							animate:reducedFlip={{easing: quintOut}}
+						>
+							<TaskCard colId={i} taskId={j} title={t.title} {completed} {total} {main} />
+						</div>
 					{:else}
 						no tasks
 					{/each}
@@ -34,7 +66,10 @@
 			<button class="column" on:click={handleNewColumn}><span>+ New Column</span></button>
 		</div>
 	{:else}
-		NO TASKS<!--temp-->
+	<div class="empty-board">
+		<h2>This board is empty. Create a new column to get started.</h2>
+		<button>+ Add New Column</button>
+	</div>
 	{/if}
 
 	{#if $mediaStore.currentScreen != "mobile"}
@@ -134,5 +169,22 @@
 	button.column span {
 		@extend %heading-1;
 		color: inherit;
+	}
+
+	.empty-board {
+		text-align: center;
+		align-self: center;
+		width: max-content;
+		margin: auto;
+	}
+	.empty-board h2 {
+		color: var(--medium-grey);
+		margin: 0 16px;
+	}
+	.empty-board button {
+		@extend %add-new-button;
+		width: 174px;
+		height: 48px;
+		margin-top: minMaxSize(24px, 32px, 768px, 1440px)
 	}
 </style>

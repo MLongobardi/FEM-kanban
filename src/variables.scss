@@ -23,7 +23,7 @@
 @media (prefers-color-scheme: dark) {
 	:root,
 	::backdrop {
-		--loading-background-color: black;
+		--loading-background-color: var(--very-dark-grey);
 		--loading-text-color: white;
 	}
 }
@@ -99,6 +99,16 @@
 		position: relative;
 		bottom: -1.5px;
 	}
+}
+
+%add-new-button {
+	@extend %heading-3;
+	--btn-color-var-1: var(--main-purple);
+	--btn-color-hov-1: var(--main-purple-hover);
+	background: var(--btn-color-var-1);
+	color: white;
+	border: none;
+	border-radius: 24px;
 }
 
 %screen-reader-only {

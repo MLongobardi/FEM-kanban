@@ -43,6 +43,7 @@ export const actions = {
 
 	addBoard: async ({ request }) => {
 		const data = processData(await request.formData(), "BOARD");
+		if (!data.columns) data.columns = [];
 		const newBoard = {
 			name: data.name,
 			columns: data.columns,
@@ -52,6 +53,7 @@ export const actions = {
 
 	editBoard: async ({ request }) => {
 		const data = processData(await request.formData(), "BOARD");
+		if (!data.columns) data.columns = [];
 		console.log("test", data);
 	},
 

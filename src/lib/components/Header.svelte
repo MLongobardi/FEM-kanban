@@ -108,14 +108,8 @@
 	}
 
 	.new-task {
-		@extend %heading-3;
-		--btn-color-var-1: var(--main-purple);
-		--btn-color-hov-1: var(--main-purple-hover);
+		@extend %add-new-button;
 		min-width: minMaxSize(140px, 164px, 550px, 768px);
-		background: var(--btn-color-var-1);
-		color: white;
-		border: none;
-		border-radius: 24px;
 		height: minMaxSize(32px, 48px);
 	}
 	.new-task:has(img) {

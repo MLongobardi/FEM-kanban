@@ -11,10 +11,9 @@
 	let columnId = $mainStore.currentTaskInEdit.columnId;
 	let taskId = $mainStore.currentTaskInEdit.taskId;
 	let task = $page.data.boards[$mainStore.currentBoard].columns[columnId].tasks[taskId];
-	$: task = $page.data.boards[$mainStore.currentBoard].columns[columnId].tasks[taskId];
 
 	let useOptimistic = false;
-	const optimisticUI = task.subtasks.map((s) => ({ isCompleted: s.isCompleted }));
+	let optimisticUI = task.subtasks.map((s) => ({ isCompleted: s.isCompleted }));
 
 	$: total = task.subtasks.length;
 	$: completed = (useOptimistic ? optimisticUI : task.subtasks).filter((s) => s.isCompleted).length;
@@ -31,7 +30,7 @@
 		{
 			text: "Delete Task",
 			func: () => {
-                $dialogStore.VIEWTASK.close();
+				$dialogStore.VIEWTASK.close();
 				mainStore.beforeActionModal("TASK", "DELETE", [columnId, taskId]);
 				$dialogStore.DELETETASKBOARD.open();
 			},
@@ -46,7 +45,7 @@
 	onMount(() => {
 		debouncedSubmit = debounce((f) => {
 			f.requestSubmit();
-		}, 1000);
+		}, 600);
 	});
 	onDestroy(() => {
 		debouncedSubmit.skip(form);
@@ -71,9 +70,21 @@
 			debouncedSubmit.deb(this);
 		}}
 		use:enhance={() => {
-			return async ({ update }) => {
+			return async ({ data, update }) => {
 				await update({ reset: false });
-				useOptimistic = false;
+				if (data.get("status") != task.status) {
+					columnId = $page.data.boards[$mainStore.currentBoard].columns.findIndex(
+						(col) => col.name == data.get("status")
+					);
+					taskId = $page.data.boards[$mainStore.currentBoard].columns[columnId].tasks.findIndex(
+						(t) => t.title == task.title
+					);
+				}
+				if (form) {
+					task = $page.data.boards[$mainStore.currentBoard].columns[columnId].tasks[taskId];
+					optimisticUI = task.subtasks.map((s) => ({ isCompleted: s.isCompleted }));
+					useOptimistic = false;
+				}
 			};
 		}}
 	>
@@ -144,7 +155,6 @@
 	}
 
 	label {
-		
 		display: flex;
 		align-items: center;
 		background: var(--light-grey);
@@ -186,7 +196,7 @@
 		}
 	}
 	label:has(input:focus-visible)::before {
-		outline:auto;
+		outline: auto;
 	}
 	label:has(input:checked)::before {
 		content: url("/images/icon-check.svg");

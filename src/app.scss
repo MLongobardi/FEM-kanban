@@ -161,6 +161,7 @@ textarea {
 	}
 }
 
+//h1, h2...
 @for $i from 1 through 4 {
 	h#{$i} {
 		@extend %heading-#{$i};

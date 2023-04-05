@@ -2,7 +2,7 @@
 	import { dialogStore, mainStore, mediaStore } from "$stores";
 	import { spring } from "svelte/motion";
 	import { derived } from "svelte/store";
-	export let colId, taskId, title, completed, total, main;
+	export let colId, taskId, title, completed, total, main//, send, receive, flip;
 	let button,
 		article,
 		timeout,
@@ -57,9 +57,12 @@
 		mainStore.beforeActionModal("TASK", "VIEW", [colId, taskId]);
 		$dialogStore.VIEWTASK.open();
 	}
-	
+
 	function updateCoords() {
-		coords.set({ l: clientX - baseX + scrolledX, t: clientY - baseY + scrolledY });
+		coords.set(
+			{ l: clientX - baseX + scrolledX, t: clientY - baseY + scrolledY },
+			{ hard: $mediaStore.misc.prefersReducedMotion }
+		);
 	}
 
 	function handleDrag(e) {

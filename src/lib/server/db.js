@@ -15,12 +15,7 @@ export function addTask(userId, boardId, newTask) {
 
 	const data = db.get(userId);
 	let columnId = data.boards[boardId].columns.findIndex((column) => column.name == newTask.status);
-	if (columnId == -1) {
-		//create new column and add newTask to it?
-		//this shouldn't happen though
-	} else {
-		data.boards[boardId].columns[columnId].tasks.push(newTask);
-	}
+	data.boards[boardId].columns[columnId].tasks.push(newTask);
 
 	db.set(userId, data);
 }
@@ -33,32 +28,46 @@ export function editTask(userId, taskInfo, newTask, subtasks) {
 	const [boardId, columnId, taskId] = taskInfo;
 	const data = db.get(userId);
 
-	let oldSubtasks = data.boards[boardId].columns[columnId].tasks[taskId].subtasks;
+	let oldTask = data.boards[boardId].columns[columnId].tasks[taskId];
 	subtasks = subtasks.map((s) => {
-		let i = oldSubtasks.findIndex((el) => el.title == s.title);
-		if (i >= 0) s.isCompleted = oldSubtasks[i].isCompleted;
+		let i = oldTask.subtasks.findIndex((el) => el.title == s.title);
+		if (i >= 0) s.isCompleted = oldTask.subtasks[i].isCompleted;
 		return s;
 	});
 	newTask.subtasks = subtasks;
 
-	//if (status didn't change)
-	data.boards[boardId].columns[columnId].tasks[taskId] = newTask;
-	//else
-	//delete old task and add new?
+	if (oldTask.status == newTask.status) {
+		data.boards[boardId].columns[columnId].tasks[taskId] = newTask;
+	} else {
+		let newColumnId = data.boards[boardId].columns.findIndex(
+			(column) => column.name == newTask.status
+		);
+		data.boards[boardId].columns[columnId].tasks.splice(taskId, 1);
+		data.boards[boardId].columns[newColumnId].tasks.push(newTask);
+	}
+
 	db.set(userId, data);
 }
 
-export function editTaskInView(userId, taskInfo, completedSubtasks, status) {
+export function editTaskInView(userId, taskInfo, completedSubtasks, newStatus) {
 	const [boardId, columnId, taskId] = taskInfo;
 	const data = db.get(userId);
 
 	let task = data.boards[boardId].columns[columnId].tasks[taskId];
-	task.status = status;
 	task.subtasks = task.subtasks.map((s) => ({
 		title: s.title,
 		isCompleted: completedSubtasks.includes(s.title),
 	}));
-	data.boards[boardId].columns[columnId].tasks[taskId] = task;
+
+	if (task.status == newStatus) {
+		data.boards[boardId].columns[columnId].tasks[taskId] = task;
+	} else {
+		let newColumnId = data.boards[boardId].columns.findIndex((column) => column.name == newStatus);
+		if (newColumnId < 0) console.log("editTaskInView error");
+		task.status = newStatus;
+		data.boards[boardId].columns[columnId].tasks.splice(taskId, 1);
+		data.boards[boardId].columns[newColumnId].tasks.push(task);
+	}
 
 	db.set(userId, data);
 }
@@ -79,7 +88,7 @@ export function addBoard(userId, newBoard) {
 }
 
 export function editBoard(userId) {
-	console.log(userId)
+	console.log(userId);
 }
 
 export function deleteBoard(userId, boardId) {
