@@ -142,7 +142,11 @@
 		}
 	}
 
+	.tasks {
+		display: contents;
+	}
 	.tasks:not(:has(article)) {
+		display: block;
 		height: 100%;
 		border-radius: 8px;
 	}
