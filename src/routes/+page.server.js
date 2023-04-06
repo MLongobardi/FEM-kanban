@@ -1,13 +1,16 @@
 import { fail } from "@sveltejs/kit";
 import * as db from "$lib/server/db.js";
-import { getId } from "$scripts";
+import { getId, getCookieExpireDate } from "$lib/server/utils.js";
 
 export function load({ cookies }) {
-	//const id = "test";
-	const id = getId(cookies);
-
+	let id = getId(cookies);
 	if (!id) {
-		cookies.set("userId", crypto.randomUUID(), { path: "/" });
+		//new user
+		cookies.set("userId", crypto.randomUUID(), { path: "/", expires: getCookieExpireDate() });
+		id = getId(cookies);
+	} else {
+		//refreshes expire date
+		cookies.set("userId", id, { path: "/", expires: getCookieExpireDate() });
 	}
 
 	return db.getData(id) ?? {};

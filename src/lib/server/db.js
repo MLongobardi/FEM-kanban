@@ -13,11 +13,11 @@ testData.boards.forEach((board) => {
 	});
 });
 
-db.set("test", testData);
+db.set("test", JSON.parse(JSON.stringify(testData))); //deep copy
 
 export function getData(userId) {
 	if (!db.get(userId)) {
-		db.set(userId, startData);
+		db.set(userId, JSON.parse(JSON.stringify(startData)));
 	}
 
 	return db.get(userId);
