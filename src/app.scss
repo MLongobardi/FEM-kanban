@@ -141,8 +141,13 @@ textarea {
 }
 .dropdown.dropdown {
 	border: none;
+	background: white;
 	--width: 192px;
 	border-radius: 8px;
+
+	.dark & {
+		background: var(--very-dark-grey);
+	}
 }
 .dropdown-button.dropdown-button {
 	@extend %body-L;

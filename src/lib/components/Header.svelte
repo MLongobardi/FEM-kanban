@@ -15,7 +15,7 @@
 		$dialogStore.ADDEDITTASKBOARD.open();
 	}
 
-	const dropButtons = [
+	$: dropButtons = [
 		{
 			text: "Edit Board",
 			func: () => {
@@ -29,6 +29,7 @@
 				mainStore.beforeActionModal("BOARD", "DELETE");
 				$dialogStore.DELETETASKBOARD.open();
 			},
+			disabled: $page.data.boards.length == 1
 		},
 	];
 </script>

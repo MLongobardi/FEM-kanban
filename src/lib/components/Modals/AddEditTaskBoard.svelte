@@ -62,15 +62,15 @@
 	}
 	function removeIter(id) {
 		if (!isTask && iterables[id].tasks.length > 0) return;
+		if (isTask && iterables.length <= 1) return;
 		iterables = [...iterables.slice(0, id), ...iterables.slice(id + 1)];
 	}
 
-	onMount(()=>{
+	onMount(() => {
 		if ($mainStore.immediateNewColumn) {
-			console.log("test")
 			iterAdd.click();
 		}
-	})
+	});
 </script>
 
 <div>
@@ -91,7 +91,7 @@
 		}}
 	>
 		{#if $page.form?.error && showError}
-			<p class="error" in:reducedFly={{x: 50}}>{$page.form.error}</p>
+			<p class="error" in:reducedFly={{ x: 50 }}>{$page.form.error}</p>
 		{/if}
 		{#if isTask}
 			<input
@@ -110,7 +110,9 @@
 					name="title"
 					placeholder="e.g. Take coffee break"
 					value={isAdd ? "" : task.title}
-					pattern="(?!^{isAdd && $page.form?.title ? "\\s*"+$page.form.title+"\\s*" : ""}$)(^.*$)"
+					pattern="(?!^{isAdd && $page.form?.title
+						? '\\s*' + $page.form.title + '\\s*'
+						: ''}$)(^.*$)"
 					required
 				/>
 			{:else}
@@ -149,8 +151,14 @@
 							type="text"
 							value={isTask ? iter.title : iter.name}
 							placeholder={placeholders[i % placeholders.length]}
+							required={isTask}
 						/>
-						<button type="button" class="delete-{iterName}" on:click={() => removeIter(i)} disabled={!isTask && iterables[i].tasks.length > 0}>
+						<button
+							type="button"
+							class="delete-{iterName}"
+							on:click={() => removeIter(i)}
+							disabled={(!isTask && iterables[i].tasks.length > 0) || (isTask && iterables.length <= 1)}
+						>
 							<span class="sr-only">Delete {iterName}</span>
 						</button>
 					</div>

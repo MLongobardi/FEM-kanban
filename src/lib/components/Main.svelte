@@ -2,14 +2,10 @@
 	import { page } from "$app/stores";
 	import { dialogStore, mainStore, mediaStore } from "$stores";
 	import { TaskCard } from "$comps";
-	import { slide } from "svelte/transition";
+	import { slide, crossfade, fade } from "svelte/transition";
 	import { quintOut } from "svelte/easing";
-	import { crossfade } from "svelte/transition";
 	import { flip } from "svelte/animate";
-	
-	function reducedSlide(node, options) {
-		if (!$mediaStore.misc.prefersReducedMotion) return slide(node, options);
-	}
+
 	let main;
 
 	function handleNewColumn() {
@@ -35,19 +31,26 @@
 			};
 		},
 	});
-	$: reducedSend = $mediaStore.misc.prefersReducedMotion ? () => {} : send;
-	$: reducedReceive = $mediaStore.misc.prefersReducedMotion ? () => {} : receive;
-	$: reducedFlip = $mediaStore.misc.prefersReducedMotion
-		? () => {
-				return arguments;
-		  }
-		: flip;
+	
+	function reducedSlide(node, options) {
+		if (!$mediaStore.misc.prefersReducedMotion) return slide(node, options);
+	}
+	function reducedSend(node, options) {
+		if (!$mediaStore.misc.prefersReducedMotion) return send(node, options);
+	}
+	function reducedReceive(node, options) {
+		if (!$mediaStore.misc.prefersReducedMotion) return receive(node, options);
+	}
+	function reducedFlip(node, options) {
+		if (!$mediaStore.misc.prefersReducedMotion) return flip(node, options);
+		return () => {return arguments};
+	}
 </script>
 
 <main bind:this={main}>
 	{#key $mainStore.currentBoard}
 		{#if $page.data.boards[$mainStore.currentBoard].columns.length > 0}
-			<div class="columns-holder">
+			<div class="columns-holder" in:fade>
 				{#each $page.data.boards[$mainStore.currentBoard].columns as c, i}
 					<section class="column">
 						<h2 style:--dotColor={["#49C4E5", "#8471F2", "#67E2AE"][i%3]}>

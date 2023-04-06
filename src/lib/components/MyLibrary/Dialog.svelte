@@ -1,6 +1,7 @@
 <script>
 	import { onMount, onDestroy } from "svelte";
-	import { dialogStore } from "$stores";
+	import { dialogStore, mediaStore } from "$stores";
+	import { scale } from "svelte/transition";
 
 	/**
 	 * <Dialog name="DIALOG_NAME">
@@ -32,21 +33,31 @@
 
 	let dialog;
 	let showContent = false;
+	let timeout;
+	let canInteract = false;
+
+	function reducedScale(node, options) {
+		if (!$mediaStore.misc.prefersReducedMotion) return scale(node, options);
+	}
 
 	onMount(() => {
-		//hijack native methods
 		dialog.myShowModal = () => {
 			if (dialog.open) return;
 			if (typeof onOpen == "function") onOpen();
 			showContent = true;
+			timeout = setTimeout(() => {
+				canInteract = true;
+			}, 200);
 			dialog.showModal();
 		};
 		dialog.myClose = (mode) => {
 			if (!dialog.open) return;
 			if (mode == "easy" && typeof onEasyClose == "function") onEasyClose();
 			if (mode != "easy" && typeof onClose == "function") onClose();
-			dialog.close();
 			showContent = false;
+			clearTimeout(timeout);
+			canInteract = false;
+			dialog.close();
 		};
 
 		if (startOpen) {
@@ -59,6 +70,7 @@
 
 	onDestroy(() => {
 		if (name) dialogStore.removeInstance(name);
+		clearTimeout(timeout);
 	});
 
 	function handlePointDown(e) {
@@ -91,18 +103,20 @@
 	}
 </script>
 
-<dialog bind:this={dialog} on:pointerdown|self={handlePointDown}>
+<dialog bind:this={dialog} on:pointerdown|self={handlePointDown} class:opening={!canInteract}>
 	{#if showContent}
-		<slot {dialog}>
-			<div>
-				Empty Dialog!
-				<button
-					on:click={() => {
-						dialog.myClose();
-					}}>Close</button
-				>
-			</div>
-		</slot>
+		<div style="display:contents" in:reducedScale={{ delay: 100, start: 0.8, duration: 300 }}>
+			<slot {dialog}>
+				<div>
+					Empty Dialog!
+					<button
+						on:click={() => {
+							dialog.myClose();
+						}}>Close</button
+					>
+				</div>
+			</slot>
+		</div>
 	{/if}
 </dialog>
 
@@ -115,7 +129,13 @@
 		overflow: visible; //allows, for example, a close button to overflow
 		color: inherit;
 		background: transparent;
-		animation: fade-in 250ms;
+	}
+	dialog::backdrop {
+		animation: fade-in 300ms forwards;
+	}
+	dialog.opening,
+	dialog.opening::backdrop {
+		pointer-events: none;
 	}
 
 	dialog > :global(div) {
@@ -135,9 +155,11 @@
 
 	@keyframes fade-in {
 		from {
+			backdrop-filter: blur(0);
 			opacity: 0;
 		}
 		to {
+			backdrop-filter: blur(2px);
 			opacity: 1;
 		}
 	}
