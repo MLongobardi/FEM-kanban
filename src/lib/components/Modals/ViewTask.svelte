@@ -139,6 +139,7 @@
 		@extend %body-L;
 		color: var(--medium-grey);
 		margin: 24px 0;
+		white-space: pre-line;
 	}
 
 	.subtasks {

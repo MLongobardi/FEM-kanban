@@ -1,0 +1,41 @@
+{
+	"boards": [
+		{
+			"name": "Board 1",
+			"columns": [
+				{
+					"name": "Todo",
+					"tasks": [
+						{
+							"title": "Task 1",
+							"description": "This is an example task!",
+							"status": "Todo",
+							"subtasks": [
+								{
+									"title": "Open kanban app",
+									"isCompleted": true
+								},
+								{
+									"title": "Add some more tasks",
+									"isCompleted": false
+								},
+								{
+									"title": "Delete this task",
+									"isCompleted": false
+								}
+							]
+						}
+					]
+				},
+				{
+					"name": "Doing",
+					"tasks": []
+				},
+				{
+					"name": "Done",
+					"tasks": []
+				}
+			]
+		}
+	]
+}

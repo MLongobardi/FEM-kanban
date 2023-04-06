@@ -1,14 +1,20 @@
 import { fail } from "@sveltejs/kit";
 import * as db from "$lib/server/db.js";
+import { getId } from "$scripts";
 
-export function load() {
-	const id = "test";
+export function load({ cookies }) {
+	//const id = "test";
+	const id = getId(cookies);
 
-	return db.getData(id);
+	if (!id) {
+		cookies.set("userId", crypto.randomUUID(), { path: "/" });
+	}
+
+	return db.getData(id) ?? {};
 }
 
 export const actions = {
-	addTask: async ({ request }) => {
+	addTask: async ({ cookies, request }) => {
 		//await new Promise((fulfil) => setTimeout(fulfil, 1200)); //test delay
 		const data = processData(await request.formData(), "TASK");
 		const newTask = {
@@ -18,7 +24,7 @@ export const actions = {
 			subtasks: data.subtasks,
 		};
 		try {
-			db.addTask("test", data.taskInfo[0], newTask);
+			db.addTask(getId(cookies), data.taskInfo[0], newTask);
 		} catch (error) {
 			return fail(422, {
 				title: data.title,
@@ -27,7 +33,7 @@ export const actions = {
 		}
 	},
 
-	editTask: async ({ request }) => {
+	editTask: async ({ cookies, request }) => {
 		const data = processData(await request.formData(), "TASK");
 		if (!data.subtasks) data.subtasks = [];
 		const newTask = {
@@ -35,39 +41,39 @@ export const actions = {
 			description: data.description,
 			status: data.status,
 		};
-		db.editTask("test", data.taskInfo, newTask, data.subtasks);
+		db.editTask(getId(cookies), data.taskInfo, newTask, data.subtasks);
 	},
 
-	editTaskInView: async ({ request }) => {
+	editTaskInView: async ({ cookies, request }) => {
 		const data = processData(await request.formData(), "TASK");
 		if (!data.completedSubtasks) data.completedSubtasks = [];
-		db.editTaskInView("test", data.taskInfo, data.completedSubtasks, data.status);
+		db.editTaskInView(getId(cookies), data.taskInfo, data.completedSubtasks, data.status);
 	},
 
-	deleteTask: async ({ request }) => {
+	deleteTask: async ({ cookies, request }) => {
 		const data = processData(await request.formData(), "TASK");
-		db.deleteTask("test", data.taskInfo);
+		db.deleteTask(getId(cookies), data.taskInfo);
 	},
 
-	addBoard: async ({ request }) => {
+	addBoard: async ({ cookies, request }) => {
 		const data = processData(await request.formData(), "BOARD");
 		if (!data.columns) data.columns = [];
 		const newBoard = {
 			name: data.name,
 			columns: data.columns,
 		};
-		db.addBoard("test", newBoard);
+		db.addBoard(getId(cookies), newBoard);
 	},
 
-	editBoard: async ({ request }) => {
+	editBoard: async ({ cookies, request }) => {
 		const data = processData(await request.formData(), "BOARD");
 		if (!data.columns) data.columns = [];
-		db.editBoard("test", data.boardId, data.name, data.columns);
+		db.editBoard(getId(cookies), data.boardId, data.name, data.columns);
 	},
 
-	deleteBoard: async ({ request }) => {
+	deleteBoard: async ({ cookies, request }) => {
 		const data = processData(await request.formData(), "BOARD");
-		db.deleteBoard("test", data.boardId);
+		db.deleteBoard(getId(cookies), data.boardId);
 	},
 };
 

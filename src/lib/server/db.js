@@ -1,4 +1,5 @@
 import testData from "./testData.json";
+import startData from "./startData.json"
 
 const db = new Map();
 
@@ -6,6 +7,7 @@ const db = new Map();
 testData.boards.forEach((board) => {
 	board.columns.forEach((column) => {
 		column.tasks.forEach((task) => {
+			//if (!task.id) task.id = crypto.randomUUID(); //??
 			if (task.status == "") task.status = column.name;
 		});
 	});
@@ -14,14 +16,14 @@ testData.boards.forEach((board) => {
 db.set("test", testData);
 
 export function getData(userId) {
+	if (!db.get(userId)) {
+		db.set(userId, startData);
+	}
+
 	return db.get(userId);
 }
 
 export function addTask(userId, boardId, newTask) {
-	if (!db.has(userId)) {
-		db.set(userId, {});
-	}
-
 	const data = db.get(userId);
 
 	let allTaskTitles = [];
@@ -32,6 +34,8 @@ export function addTask(userId, boardId, newTask) {
 		throw new Error("Task titles should be unique");
 	}
 
+	//newTask.id = crypto.randomUUID(); //??
+
 	let columnId = data.boards[boardId].columns.findIndex((column) => column.name == newTask.status);
 	data.boards[boardId].columns[columnId].tasks.push(newTask);
 
@@ -39,12 +43,8 @@ export function addTask(userId, boardId, newTask) {
 }
 
 export function editTask(userId, taskInfo, newTask, subtasks) {
-	if (!db.has(userId)) {
-		db.set(userId, {});
-	}
-
-	const [boardId, columnId, taskId] = taskInfo;
 	const data = db.get(userId);
+	const [boardId, columnId, taskId] = taskInfo;
 
 	let oldTask = data.boards[boardId].columns[columnId].tasks[taskId];
 	subtasks = subtasks.map((s) => {
@@ -68,8 +68,8 @@ export function editTask(userId, taskInfo, newTask, subtasks) {
 }
 
 export function editTaskInView(userId, taskInfo, completedSubtasks, newStatus) {
-	const [boardId, columnId, taskId] = taskInfo;
 	const data = db.get(userId);
+	const [boardId, columnId, taskId] = taskInfo;
 
 	let task = data.boards[boardId].columns[columnId].tasks[taskId];
 	task.subtasks = task.subtasks.map((s) => ({
@@ -91,8 +91,9 @@ export function editTaskInView(userId, taskInfo, completedSubtasks, newStatus) {
 }
 
 export function deleteTask(userId, taskInfo) {
-	const [boardId, columnId, taskId] = taskInfo;
 	const data = db.get(userId);
+	const [boardId, columnId, taskId] = taskInfo;
+	
 	data.boards[boardId].columns[columnId].tasks.splice(taskId, 1);
 
 	db.set(userId, data);
