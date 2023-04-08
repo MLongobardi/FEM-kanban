@@ -3,6 +3,8 @@
 	import { page } from "$app/stores";
 	import { enhance } from "$app/forms";
 
+	export let inTransition;
+
 	let isTask = $mainStore.currentActionTarget == "TASK";
 	let task, columnId, taskId;
 	let board = $page.data.boards[$mainStore.currentBoard];
@@ -13,7 +15,7 @@
 	}
 </script>
 
-<div>
+<div in:inTransition>
 	<h2>Delete this {isTask ? "task" : "board"}?</h2>
 	<p>
 		{#if isTask}

@@ -3,17 +3,17 @@
 	import { mainStore, mediaStore } from "$stores";
 </script>
 
-<Dialog name="ADDEDITTASKBOARD" onClose={mainStore.afterActionModal}>
-	<AddEditTaskBoard />
+<Dialog name="ADDEDITTASKBOARD" let:inTransition onClose={mainStore.afterActionModal}>
+	<AddEditTaskBoard {inTransition} />
 </Dialog>
-<Dialog name="VIEWTASK" onClose={mainStore.afterActionModal}>
-	<ViewTask />
+<Dialog name="VIEWTASK" let:inTransition onClose={mainStore.afterActionModal}>
+	<ViewTask {inTransition} />
 </Dialog>
-<Dialog name="DELETETASKBOARD" onClose={mainStore.afterActionModal}>
-	<DeleteTaskBoard />
+<Dialog name="DELETETASKBOARD" let:inTransition onClose={mainStore.afterActionModal}>
+	<DeleteTaskBoard {inTransition} />
 </Dialog>
 {#if $mediaStore.currentScreen == "mobile"}
-	<Dialog name="MOBILESIDEBAR">
-		<MobileSidebar />
+	<Dialog name="MOBILESIDEBAR" let:inTransition>
+		<MobileSidebar {inTransition} />
 	</Dialog>
 {/if}

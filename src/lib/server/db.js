@@ -1,13 +1,13 @@
 import testData from "./testData.json";
-import startData from "./startData.json"
+import startData from "./startData.json";
 
 const db = new Map();
 
 //4 tasks in the provided json have an empty status entry, this fixes them
+//also applies an unique id to each task
 testData.boards.forEach((board) => {
 	board.columns.forEach((column) => {
 		column.tasks.forEach((task) => {
-			//if (!task.id) task.id = crypto.randomUUID(); //??
 			if (task.status == "") task.status = column.name;
 		});
 	});
@@ -33,8 +33,6 @@ export function addTask(userId, boardId, newTask) {
 	if (allTaskTitles.includes(newTask.title)) {
 		throw new Error("Task titles should be unique");
 	}
-
-	//newTask.id = crypto.randomUUID(); //??
 
 	let columnId = data.boards[boardId].columns.findIndex((column) => column.name == newTask.status);
 	data.boards[boardId].columns[columnId].tasks.push(newTask);
@@ -93,7 +91,7 @@ export function editTaskInView(userId, taskInfo, completedSubtasks, newStatus) {
 export function deleteTask(userId, taskInfo) {
 	const data = db.get(userId);
 	const [boardId, columnId, taskId] = taskInfo;
-	
+
 	data.boards[boardId].columns[columnId].tasks.splice(taskId, 1);
 
 	db.set(userId, data);
@@ -128,8 +126,9 @@ export function deleteBoard(userId, boardId) {
 export function testAPI(userid, boardId, oldInfo, newInfo) {
 	const data = db.get(userid);
 
-	const task = data.boards[boardId].columns[oldInfo.col].tasks.splice(oldInfo.task, 1);
-	data.boards[boardId].columns[newInfo.col].tasks.splice(newInfo.task, 0, ...task);
+	const task = data.boards[boardId].columns[oldInfo.col].tasks.splice(oldInfo.task, 1)[0];
+	task.status = data.boards[boardId].columns[newInfo.col].name;
+	data.boards[boardId].columns[newInfo.col].tasks.splice(newInfo.task, 0, task);
 
 	db.set(userid, data);
 }

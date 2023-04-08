@@ -2,7 +2,16 @@
 	import { dialogStore, mainStore, mediaStore } from "$stores";
 	import { spring } from "svelte/motion";
 	import { derived } from "svelte/store";
-	export let colId, taskId, title, completed, total, main//, send, receive, flip;
+
+	export let colId,
+		taskId,
+		title,
+		completed,
+		total,
+		main,
+		ghost = false,
+		temporary = false;
+
 	let button,
 		card,
 		timeout,
@@ -25,7 +34,7 @@
 			t: 3 + 4, //I don't know why but it needs 4px more
 			b: 3 + 12, //sidebar
 		},
-		delay = 200;
+		delay = 150;
 
 	const coords = spring(
 		{ l: 0, t: 0 },
@@ -54,6 +63,7 @@
 	}
 
 	function handleClick() {
+		if (ghost) return;
 		mainStore.beforeActionModal("TASK", "VIEW", [colId, taskId]);
 		$dialogStore.VIEWTASK.open();
 	}
@@ -66,8 +76,11 @@
 	}
 
 	function handleDrag(e) {
-		//mainBoundingRect = main.getBoundingClientRect(); //shouldn't be needed
+		if (neverDragged) {
+			mainStore.startDrag({ colId: colId, taskId: taskId });
+		}
 		neverDragged = false;
+		//mainBoundingRect = main.getBoundingClientRect(); //shouldn't be needed
 		clientX = e.clientX;
 		clientY = e.clientY;
 		updateCoords();
@@ -80,7 +93,7 @@
 	}
 
 	function handlePointerDown(e) {
-		if (e.button != 0) return;
+		if (ghost || e.button != 0) return;
 		document.addEventListener("pointerup", handlePointerUp, { once: true });
 		if (!$mediaStore.misc.hoverable) return;
 		mainBoundingRect = main.getBoundingClientRect();
@@ -105,8 +118,10 @@
 		}, delay);
 	}
 	function handlePointerUp(e) {
+		if (ghost) return;
 		clearTimeout(timeout);
 		if ((!dragging || neverDragged) && e && e.target == card) redirectClick(e);
+		mainStore.endDrag();
 		dragging = false;
 		neverDragged = true;
 		document.removeEventListener("mousemove", handleDrag);
@@ -118,6 +133,7 @@
 	}
 	function abort() {
 		if (dragging) {
+			coords.set({ l: 0, t: 0 }, { hard: true });
 			document.removeEventListener("pointerup", handlePointerUp);
 			handlePointerUp();
 		}
@@ -130,7 +146,10 @@
 	on:pointerdown={handlePointerDown}
 	on:focusout={abort}
 	class:dragging
+	class:ghost
+	class:temporary
 	style:cursor={dragging && !neverDragged ? "grab" : ""}
+	style:--ghost-offset={-card?.offsetHeight + "px"}
 	style:left={$boundCoords.l + "px"}
 	style:top={$boundCoords.t + "px"}
 >
@@ -140,6 +159,10 @@
 	{completed} of {total} subtasks
 	<button bind:this={button} on:click|stopPropagation={handleClick}>View full task info</button>
 </div>
+{#if $boundCoords.t != 0 && $boundCoords.l != 0}
+	<!--like "dragging && !neverDragged", but persists while spring is still springing-->
+	<svelte:self {...$$props} ghost={true} />
+{/if}
 
 <style lang="scss">
 	:global(body):has(.task-card:is(.dragging, :active)) {
@@ -155,21 +178,22 @@
 	}
 
 	.task-card {
+		--gap: 20px;
 		position: relative;
-		z-index: 0;
+		z-index: 1;
 		width: 100%;
 		box-sizing: border-box;
 		padding: 23px 16px;
 		border-radius: 8px;
 		background: white;
-		margin-bottom: 20px;
+		margin-bottom: var(--gap);
 		box-shadow: 0px 4px 6px rgba(54, 78, 126, 0.101545);
 		background: var(--background-color);
 	}
 	.task-card.dragging {
-		//cursor: grab !important;
+		pointer-events: none;
 		position: relative;
-		z-index: 1;
+		z-index: 2;
 	}
 	:global(.hoverable) .task-card:hover {
 		cursor: pointer;
@@ -180,7 +204,7 @@
 	.task-card:active:not(.dragging),
 	.task-card:has(button:focus-visible) {
 		margin-top: 4px;
-		margin-bottom: 16px;
+		margin-bottom: calc(var(--gap) - 4px);
 		box-shadow: none;
 	}
 	.task-card:has(button:focus-visible) {
@@ -193,6 +217,15 @@
 	}
 	.task-card:is(:active, .dragging) .task-title {
 		color: var(--main-purple);
+	}
+
+	.task-card.ghost, .task-card.temporary {
+		position: static; //negates z-index and left/top
+		pointer-events: none;
+		opacity: 0.5;
+	}
+	.task-card.ghost {
+		margin-top: calc(var(--ghost-offset) - var(--gap));
 	}
 
 	button {

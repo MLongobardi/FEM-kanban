@@ -4,7 +4,7 @@ import { getId, getCookieExpireDate } from "$lib/server/utils.js";
 
 export function load({ cookies }) {
 	let id = getId(cookies);
-	if (!id) {
+	if (!id || id == "test") {
 		//new user
 		cookies.set("userId", crypto.randomUUID(), { path: "/", expires: getCookieExpireDate() });
 		id = getId(cookies);

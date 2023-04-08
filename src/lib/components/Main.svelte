@@ -2,11 +2,37 @@
 	import { page } from "$app/stores";
 	import { dialogStore, mainStore, mediaStore } from "$stores";
 	import { TaskCard } from "$comps";
+	import { debounce } from "$scripts";
 	import { slide, crossfade, fade } from "svelte/transition";
 	import { quintOut } from "svelte/easing";
 	import { flip } from "svelte/animate";
 
 	let main;
+
+	$: optimisticColumns = $page.data.boards[$mainStore.currentBoard].columns.map((c, colId) => ({
+		name: c.name,
+		tasks: injectDraggedTask(colId, c.tasks),
+	}));
+
+	function injectDraggedTask(colTarget, tasks) {
+		if (!$mainStore.dragInProgress) return tasks;
+		let oldInfo = $mainStore.dragged.oldInfo;
+		let newInfo = $mainStore.dragged.newInfo;
+		if (oldInfo.colId == newInfo.colId && oldInfo.taskId == newInfo.taskId) return tasks;
+		if (newInfo.colId == null || newInfo.taskId == null || colTarget != newInfo.colId) return tasks;
+		let task =
+			$page.data.boards[$mainStore.currentBoard].columns[oldInfo.colId].tasks[oldInfo.taskId];
+		let tempTask = {
+			temporary: true,
+			//id: "drag" + colTarget,
+			title: task.title + "\u200a".repeat(colTarget + 1), //title is used as key for #each block
+			description: task.description,
+			status: task.status,
+			subtasks: task.subtasks,
+		};
+
+		return [...tasks.slice(0, newInfo.taskId), tempTask, ...tasks.slice(newInfo.taskId)];
+	}
 
 	function handleNewColumn() {
 		mainStore.beforeActionModal("BOARD", "EDIT", true);
@@ -14,15 +40,15 @@
 	}
 
 	const [send, receive] = crossfade({
-		duration: (d) => Math.sqrt(d * 200),
+		duration: (d) => Math.sqrt(d) * 40,
 
 		fallback(node, params) {
 			const style = getComputedStyle(node);
 			const transform = style.transform === "none" ? "" : style.transform;
 
 			return {
-				delay: 100,
-				duration: 500,
+				delay: $mainStore.dragInProgress ? 0 : 150,
+				duration: $mainStore.dragInProgress ? 0 : 500,
 				easing: quintOut,
 				css: (t) => `
 					transform: ${transform} scale(${t});
@@ -31,7 +57,7 @@
 			};
 		},
 	});
-	
+
 	function reducedSlide(node, options) {
 		if (!$mediaStore.misc.prefersReducedMotion) return slide(node, options);
 	}
@@ -41,32 +67,52 @@
 	function reducedReceive(node, options) {
 		if (!$mediaStore.misc.prefersReducedMotion) return receive(node, options);
 	}
-	function reducedFlip(node, options) {
-		if (!$mediaStore.misc.prefersReducedMotion) return flip(node, options);
-		return () => {return arguments};
+	function reducedFlip(node, fromTo, options) {
+		if (!$mediaStore.misc.prefersReducedMotion) return flip(node, fromTo, options);
+		return {};
 	}
+
+	let debouncedUpdateDrag = debounce((i, j) => {
+		mainStore.updateDrag({ colId: i, taskId: j });
+	}, 30);
 </script>
 
 <main bind:this={main}>
 	{#key $mainStore.currentBoard}
 		{#if $page.data.boards[$mainStore.currentBoard].columns.length > 0}
 			<div class="columns-holder" in:fade>
-				{#each $page.data.boards[$mainStore.currentBoard].columns as c, i}
+				{#each optimisticColumns as c, i}<!--$page.data.boards[$mainStore.currentBoard].columns-->
 					<section class="column">
-						<h2 style:--dotColor={["#49C4E5", "#8471F2", "#67E2AE"][i%3]}>
+						<h2 style:--dotColor={["#49C4E5", "#8471F2", "#67E2AE"][i % 3]}>
 							{c.name} ({c.tasks.length})
 						</h2>
 						<div class="tasks">
-							{#each c.tasks as t, j (t.title)}
+							{#each c.tasks as t, j (t.title)}<!--injectDraggedTask(i, c.tasks) ; (t.title)-->
 								{@const total = t.subtasks.length}
 								{@const completed = t.subtasks.filter((s) => s.isCompleted).length}
+								<!-- svelte-ignore a11y-mouse-events-have-key-events -->
 								<article
-									class="task-holder"
+									on:mouseover={$mainStore.dragInProgress
+										? () => {
+												debouncedUpdateDrag.deb(i, j);
+										  }
+										: null}
 									in:reducedReceive|local={{ key: t.title }}
 									out:reducedSend|local={{ key: t.title }}
-									animate:reducedFlip={{ easing: quintOut }}
+									animate:reducedFlip={{
+										easing: quintOut,
+										duration: (d) => Math.sqrt(d) * ($mainStore.dragInProgress ? 20 : 200),
+									}}
 								>
-									<TaskCard colId={i} taskId={j} title={t.title} {completed} {total} {main} />
+									<TaskCard
+										colId={i}
+										taskId={j}
+										title={t.title}
+										{completed}
+										{total}
+										{main}
+										temporary={t?.temporary}
+									/>
 								</article>
 							{/each}
 						</div>
@@ -77,9 +123,7 @@
 		{:else}
 			<div class="empty-board">
 				<h2>This board is empty. Create a new column to get started.</h2>
-				<button
-					on:click={handleNewColumn}>+ Add New Column</button
-				>
+				<button on:click={handleNewColumn}>+ Add New Column</button>
 			</div>
 		{/if}
 
@@ -120,14 +164,12 @@
 	.column {
 		width: 280px;
 		flex-shrink: 0;
-		margin-top: 24px;
-		margin-left: 24px;
-		margin: 0 12px 0 12px;
 		display: flex; //prevents margin collapsing, so that the .task-card:active effect works
 		flex-direction: column;
 	}
 	.column h2 {
 		@extend %heading-4;
+		padding: 0 12px;
 		display: inline-flex;
 		margin-bottom: 24px;
 
@@ -149,6 +191,10 @@
 		display: block;
 		height: 100%;
 		border-radius: 8px;
+	}
+
+	article {
+		padding: 0 12px;
 	}
 
 	button.column {

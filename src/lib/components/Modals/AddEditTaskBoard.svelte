@@ -6,6 +6,8 @@
 	import { fly } from "svelte/transition";
 	import { onMount } from "svelte";
 
+	export let inTransition;
+
 	let iterables, iterName, capitalIterName, board, task, columnId, taskId, selectOptions, iterAdd;
 	let iterHolder;
 	let showError = false;
@@ -73,7 +75,7 @@
 	});
 </script>
 
-<div>
+<div in:inTransition>
 	<h2>{isAdd ? "Add New" : "Edit"} {isTask ? "Task" : "Board"}</h2>
 	<form
 		method="POST"
@@ -157,7 +159,8 @@
 							type="button"
 							class="delete-{iterName}"
 							on:click={() => removeIter(i)}
-							disabled={(!isTask && iterables[i].tasks.length > 0) || (isTask && iterables.length <= 1)}
+							disabled={(!isTask && iterables[i].tasks.length > 0) ||
+								(isTask && iterables.length <= 1)}
 						>
 							<span class="sr-only">Delete {iterName}</span>
 						</button>

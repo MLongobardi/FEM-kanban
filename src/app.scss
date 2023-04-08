@@ -42,8 +42,9 @@ dialog::backdrop {
 	background: rgba(0, 0, 0, 0.5);
 }
 dialog > div {
-	//max-height: 95vh;
-	//overflow-y: auto;
+	max-height: 90vh;
+	overflow-x: hidden; //should really be visible, but apparently if one is set to auto/scroll the other can't be set to visible
+	overflow-y: auto;
 	display: block !important;
 	background: var(--background-color);
 	box-sizing: border-box;

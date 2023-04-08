@@ -4,13 +4,15 @@ import * as mainStoreMethods from "./methods/mainStore.js";
 
 const startObject = {
 	currentBoard: 0,
-	currentActionTarget: "", //"BOARD" | "TASK" | ""
-	currentActionType: "", //"ADD" | "EDIT" | "VIEW" | "DELETE" | "DELETE" | ""
+	currentActionTarget: "", // "BOARD" | "TASK" | ""
+	currentActionType: "", // "ADD" | "EDIT" | "VIEW" | "DELETE" | "DELETE" | ""
 	currentTaskInEdit: {
 		columnId: null,
 		taskId: null,
 	},
 	immediateNewColumn: false,
+	dragInProgress: false,
+	dragged: null, // {oldInfo: {colId, taskId}, newInfo: {colId, taskId}}
 	darkMode: true,
 	showSidebarOnBigScreen: true,
 };

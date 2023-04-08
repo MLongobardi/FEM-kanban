@@ -52,7 +52,7 @@
 		<!--start test-->
 		<div style="margin: auto; background: rgba(100,100,100,0.1)">
 			TEST<br />
-			This is not a form!<br><br>
+			This is not a form!<br /><br />
 			Move task at
 			<div>
 				column:
@@ -80,7 +80,7 @@
 				</select>
 				index:
 				<select bind:value={testNewTask}>
-					{#each ($page.data.boards[$mainStore.currentBoard].columns[testNewCol]?.tasks ?? []).concat(["one-more"]) as t, i}
+					{#each ($page.data.boards[$mainStore.currentBoard].columns[testNewCol]?.tasks ?? []).concat(testOldCol != testNewCol ? ["one-more"] : []) as t, i}
 						<option value={i}>{i}</option>
 					{/each}
 				</select>

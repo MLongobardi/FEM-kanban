@@ -6,6 +6,8 @@
 	import { onMount, onDestroy } from "svelte";
 	import { debounce } from "$scripts";
 
+	export let inTransition;
+
 	let form;
 
 	let columnId = $mainStore.currentTaskInEdit.columnId;
@@ -52,7 +54,7 @@
 	});
 </script>
 
-<div>
+<div in:inTransition>
 	<div class="header">
 		<h2>{task.title}</h2>
 		<Dropdown {dropButtons}>

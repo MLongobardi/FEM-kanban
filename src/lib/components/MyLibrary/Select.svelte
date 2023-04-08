@@ -23,6 +23,7 @@
 
 	let select;
 	let holder;
+	let holderWidth;
 	let value = options[initial].value; //initialized to first value
 	$: selectedId = options.findIndex((o) => o.value == value);
 	let showDropdown = false;
@@ -82,7 +83,7 @@
 	</select>
 </div>
 {#if $mediaStore.misc.hoverable}
-	<div class="my-select-wrapper" class:chevron aria-hidden="true" bind:this={holder}>
+	<div class="my-select-wrapper" class:chevron aria-hidden="true" bind:this={holder} bind:clientWidth={holderWidth}>
 		<button
 			class="my-select"
 			tabindex="-1"
@@ -97,6 +98,7 @@
 		{#if showDropdown}
 			<div
 				class="options-holder"
+				style:--parentWidth={holderWidth+"px"}
 				on:focusout={function (e) {
 					//not using an arrow function lets me use the this keyword
 					if (!this.contains(e.relatedTarget)) closeDropdown();
@@ -176,14 +178,17 @@
 	}
 
 	.options-holder {
-		position: absolute;
-		top: calc(100% + 10px);
-		width: 100%;
+		//position: absolute;
+		//top: calc(100% + 10px);
+		position: fixed;
+		margin-top: 10px;
+		width: var(--parentWidth); //set with js because of position: fixed;
 		border-radius: 8px;
 		background: var(--bg);
 		z-index: 1;
 		max-height: 120px;
-		overflow: auto;
+		overflow-x: visible;
+		overflow-y: auto;
 	}
 
 	.option {

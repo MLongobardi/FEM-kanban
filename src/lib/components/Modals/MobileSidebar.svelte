@@ -1,8 +1,10 @@
 <script>
     import { BoardList, DarkLightSwitch } from "$comps";
+
+    export let inTransition;
 </script>
 
-<div class="mobile-sidebar">
+<div class="mobile-sidebar" in:inTransition>
     <BoardList />
     <DarkLightSwitch />
 </div>

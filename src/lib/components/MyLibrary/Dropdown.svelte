@@ -1,6 +1,4 @@
 <script>
-	import { onMount, onDestroy } from "svelte";
-
 	/**
 	 * When using this component, if you want to declare the dropButtons prop in the script tag, you need to make it reactive.
 	 * Or else disabled won't work.
@@ -52,9 +50,8 @@
 </div>
 
 <style lang="scss">
-	/**
-	* :where() is used to reduce specificity, but svelte adds a class to scope styles to a component
-	*/
+	// :where() is used to reduce specificity, but svelte adds a class to scope styles to a component
+
 	:where(.dropdown-holder) {
 		position: relative;
 		box-sizing: border-box;
@@ -66,7 +63,7 @@
 		display: none;
 		width: var(--width);
 		position: absolute;
-		z-index: 1;
+		z-index: 2;
 		background: white;
 		border: solid 1px #e8e8e8;
 		border-radius: 0 0 8px 8px;

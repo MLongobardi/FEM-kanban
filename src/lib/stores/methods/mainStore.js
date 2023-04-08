@@ -45,3 +45,20 @@ export function afterActionModal(draft) {
 	draft.currentTaskInEdit.taskId = null;
 	draft.immediateNewColumn = false;
 }
+
+export function startDrag(draft, oldInfo) {
+	if (draft.dragInProgress) return;
+	draft.dragInProgress = true;
+	draft.dragged = { oldInfo: oldInfo, newInfo: { colId: null, taskId: null } };
+}
+
+export function updateDrag(draft, newInfo) {
+	if (!draft.dragInProgress) return;
+	draft.dragged.newInfo = newInfo;
+}
+
+export function endDrag(draft) {
+	if (!draft.dragInProgress) return;
+	draft.dragInProgress = false;
+	draft.dragged = null;
+}

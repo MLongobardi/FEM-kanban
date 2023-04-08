@@ -4,8 +4,9 @@
 	import { scale } from "svelte/transition";
 
 	/**
-	 * <Dialog name="DIALOG_NAME">
-	 *     //dialog content here, all of it must be inside a single div
+	 * <Dialog name="DIALOG_NAME" let:inTransition>
+	 *		//dialog content here, all of it must be inside a single div
+	 *		//it can optionally have the in:inTransition directive
 	 * </Dialog>
 	 *
 	 * Then, anywhere you need it, import dialogStore and call
@@ -37,6 +38,8 @@
 	let canInteract = false;
 
 	function reducedScale(node, options) {
+		//sets some default options
+		if (Object.keys(options).length == 0) options = { delay: 100, start: 0.8, duration: 300 };
 		if (!$mediaStore.misc.prefersReducedMotion) return scale(node, options);
 	}
 
@@ -105,18 +108,16 @@
 
 <dialog bind:this={dialog} on:pointerdown|self={handlePointDown} class:opening={!canInteract}>
 	{#if showContent}
-		<div style="display:contents" in:reducedScale={{ delay: 100, start: 0.8, duration: 300 }}>
-			<slot {dialog}>
-				<div>
-					Empty Dialog!
-					<button
-						on:click={() => {
-							dialog.myClose();
-						}}>Close</button
-					>
-				</div>
-			</slot>
-		</div>
+		<slot inTransition={reducedScale}>
+			<div in:reducedScale>
+				Empty Dialog!
+				<button
+					on:click={() => {
+						dialog.myClose();
+					}}>Close</button
+				>
+			</div>
+		</slot>
 	{/if}
 </dialog>
 
