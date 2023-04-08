@@ -36,6 +36,14 @@
 		},
 		delay = 150;
 
+	let heightJump = 0; //if moving a card up in the same column
+	$: heightJump =
+		card &&
+		$mainStore.dragged?.oldInfo?.colId == $mainStore.dragged?.newInfo?.colId &&
+		$mainStore.dragged?.oldInfo?.taskId > $mainStore.dragged?.newInfo?.taskId
+			? -card.offsetHeight - 20
+			: 0;
+
 	const coords = spring(
 		{ l: 0, t: 0 },
 		{
@@ -47,7 +55,7 @@
 
 	const boundCoords = derived(coords, ($c) => {
 		let bl = $c.l - offsetX + baseX - scrolledX;
-		let bt = $c.t - offsetY + baseY - scrolledY;
+		let bt = $c.t - offsetY + baseY - scrolledY - heightJump;
 		if (card && !neverDragged) {
 			bl = Math.max(bl, mainBoundingRect.left + boundOffset.l);
 			bl = Math.min(bl, mainBoundingRect.right - card.offsetWidth - boundOffset.r);
@@ -55,7 +63,7 @@
 			bt = Math.min(bt, mainBoundingRect.bottom - card.offsetHeight - boundOffset.b);
 		}
 
-		return { l: bl + offsetX - baseX + scrolledX, t: bt + offsetY - baseY + scrolledY };
+		return { l: bl + offsetX - baseX + scrolledX, t: bt + offsetY - baseY + scrolledY + heightJump };
 	});
 
 	function redirectClick(e) {
@@ -70,7 +78,7 @@
 
 	function updateCoords() {
 		coords.set(
-			{ l: clientX - baseX + scrolledX, t: clientY - baseY + scrolledY },
+			{ l: clientX - baseX + scrolledX, t: clientY - baseY + scrolledY + heightJump },
 			{ hard: $mediaStore.misc.prefersReducedMotion }
 		);
 	}
@@ -96,6 +104,7 @@
 		if (ghost || e.button != 0) return;
 		document.addEventListener("pointerup", handlePointerUp, { once: true });
 		if (!$mediaStore.misc.hoverable) return;
+		if ($mainStore.dragIsPending) return;
 		mainBoundingRect = main.getBoundingClientRect();
 		if (card.offsetWidth > mainBoundingRect.width - boundOffset.l - boundOffset.r) return;
 		if (card.offsetHeight > mainBoundingRect.height - boundOffset.t - boundOffset.b) return;
@@ -215,16 +224,21 @@
 		margin-bottom: 8px;
 		pointer-events: none;
 	}
-	.task-card:is(:active, .dragging) .task-title {
+	.task-card:is(:active, .dragging, .temporary) .task-title {
 		color: var(--main-purple);
 	}
 
-	.task-card.ghost, .task-card.temporary {
+	.task-card.ghost,
+	.task-card.temporary {
 		position: static; //negates z-index and left/top
 		pointer-events: none;
-		opacity: 0.5;
+		
+	}
+	.task-card.temporary {
+		opacity: 0.7;
 	}
 	.task-card.ghost {
+		opacity: 0.4;
 		margin-top: calc(var(--ghost-offset) - var(--gap));
 	}
 

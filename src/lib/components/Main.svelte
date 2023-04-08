@@ -8,23 +8,54 @@
 	import { flip } from "svelte/animate";
 
 	let main;
+	//$:console.log($mainStore.dragged?.oldInfo?.taskId,"->", $mainStore.dragged?.newInfo?.taskId)
 
 	$: optimisticColumns = $page.data.boards[$mainStore.currentBoard].columns.map((c, colId) => ({
 		name: c.name,
-		tasks: injectDraggedTask(colId, c.tasks),
+		tasks: optimisticTasks(colId, c.tasks),
 	}));
+
+	function optimisticTasks(colTarget, tasks) {
+		if ($mainStore.dragInProgress) {
+			return injectDraggedTask(colTarget, tasks);
+		} else if ($mainStore.dragIsPending) {
+			/*backend hasn't finished processing request*/
+			let answer = tasks;
+			let oldInfo = $mainStore.dragged.oldInfo;
+			let newInfo = $mainStore.dragged.newInfo;
+			if (oldInfo.colId == colTarget) {
+				answer = [...answer.slice(0, oldInfo.taskId), ...answer.slice(oldInfo.taskId + 1)];
+			}
+			if (newInfo.colId == colTarget) {
+				let draggedTask =
+					$page.data.boards[$mainStore.currentBoard].columns[oldInfo.colId].tasks[oldInfo.taskId];
+				let newId = newInfo.taskId;
+				if (oldInfo.colId == newInfo.colId) {
+					newId--;
+				}
+
+				answer = [...answer.slice(0, newId), draggedTask, ...answer.slice(newId)];
+			}
+			return answer;
+		}
+		return tasks; //if no drag is in progress/pending, or if drag is pending but colTarget isn't affected
+	}
 
 	function injectDraggedTask(colTarget, tasks) {
 		if (!$mainStore.dragInProgress) return tasks;
 		let oldInfo = $mainStore.dragged.oldInfo;
 		let newInfo = $mainStore.dragged.newInfo;
 		if (oldInfo.colId == newInfo.colId && oldInfo.taskId == newInfo.taskId) return tasks;
+		if (oldInfo.colId == colTarget)
+			tasks = tasks.map((t, i) => {
+				if (i == oldInfo.taskId) return { ...{ ghost: true }, ...t };
+				return t;
+			});
 		if (newInfo.colId == null || newInfo.taskId == null || colTarget != newInfo.colId) return tasks;
 		let task =
 			$page.data.boards[$mainStore.currentBoard].columns[oldInfo.colId].tasks[oldInfo.taskId];
 		let tempTask = {
 			temporary: true,
-			//id: "drag" + colTarget,
 			title: task.title + "\u200a".repeat(colTarget + 1), //title is used as key for #each block
 			description: task.description,
 			status: task.status,
@@ -40,15 +71,15 @@
 	}
 
 	const [send, receive] = crossfade({
-		duration: (d) => Math.sqrt(d) * 40,
+		duration: (d) => Math.sqrt(d) * ($mainStore.dragIsPending ? 0 : 40),
 
 		fallback(node, params) {
 			const style = getComputedStyle(node);
 			const transform = style.transform === "none" ? "" : style.transform;
 
 			return {
-				delay: $mainStore.dragInProgress ? 0 : 150,
-				duration: $mainStore.dragInProgress ? 0 : 500,
+				delay: $mainStore.dragIsPending ? 5 : 150,
+				duration: $mainStore.dragIsPending ? 5 : 500,
 				easing: quintOut,
 				css: (t) => `
 					transform: ${transform} scale(${t});
@@ -73,25 +104,41 @@
 	}
 
 	let debouncedUpdateDrag = debounce((i, j) => {
+		if ($mainStore.dragged.oldInfo.colId == i) {
+			let oldJ = $mainStore.dragged.oldInfo.taskId;
+			if (oldJ == j) j++;
+			console.log(j, optimisticColumns[i].tasks.length);
+			//else if (j == optimisticColumns[i].tasks.length+1) j--;
+			//else j--;
+		}
 		mainStore.updateDrag({ colId: i, taskId: j });
-	}, 30);
+	}, 50);
 </script>
 
 <main bind:this={main}>
 	{#key $mainStore.currentBoard}
 		{#if $page.data.boards[$mainStore.currentBoard].columns.length > 0}
 			<div class="columns-holder" in:fade>
-				{#each optimisticColumns as c, i}<!--$page.data.boards[$mainStore.currentBoard].columns-->
+				{#each optimisticColumns as c, i}
 					<section class="column">
 						<h2 style:--dotColor={["#49C4E5", "#8471F2", "#67E2AE"][i % 3]}>
-							{c.name} ({c.tasks.length})
+							{c.name} ({c.tasks.filter((t) => !t?.ghost).length})
 						</h2>
-						<div class="tasks">
-							{#each c.tasks as t, j (t.title)}<!--injectDraggedTask(i, c.tasks) ; (t.title)-->
+						<!-- svelte-ignore a11y-mouse-events-have-key-events -->
+						<div
+							class="tasks"
+							on:mouseover|self={$mainStore.dragInProgress
+								? () => {
+										debouncedUpdateDrag.deb(i, c.tasks.length);
+								  }
+								: null}
+						>
+							{#each c.tasks as t, j (t.title)}
 								{@const total = t.subtasks.length}
 								{@const completed = t.subtasks.filter((s) => s.isCompleted).length}
 								<!-- svelte-ignore a11y-mouse-events-have-key-events -->
 								<article
+									class:ghost={t?.ghost}
 									on:mouseover={$mainStore.dragInProgress
 										? () => {
 												debouncedUpdateDrag.deb(i, j);
@@ -101,7 +148,7 @@
 									out:reducedSend|local={{ key: t.title }}
 									animate:reducedFlip={{
 										easing: quintOut,
-										duration: (d) => Math.sqrt(d) * ($mainStore.dragInProgress ? 20 : 200),
+										duration: (d) => Math.sqrt(d) * ($mainStore.dragInProgress ? 15 : 200),
 									}}
 								>
 									<TaskCard
@@ -162,9 +209,8 @@
 	}
 
 	.column {
-		width: 280px;
 		flex-shrink: 0;
-		display: flex; //prevents margin collapsing, so that the .task-card:active effect works
+		display: flex;
 		flex-direction: column;
 	}
 	.column h2 {
@@ -185,33 +231,34 @@
 	}
 
 	.tasks {
-		display: contents;
+		display: flex; //prevents margin collapsing, so that the .task-card:active effect works
+		flex-direction: column;
+		box-sizing: border-box;
+		width: 304px;
+		height: 100%;
 	}
 	.tasks:not(:has(article)) {
-		display: block;
-		height: 100%;
+		width: 280px;
+		margin: 0 12px;
 		border-radius: 8px;
-	}
-
-	article {
-		padding: 0 12px;
+		border: 2px solid var(--lines-color);
 	}
 
 	button.column {
 		--btn-color-var-1: var(--medium-grey);
 		--btn-color-hov-1: var(--main-purple);
 		display: flex;
+		width: 280px;
 		justify-content: center;
 		align-items: center;
-		margin-top: 39.12px; //24px + 12px * 1.26
-		margin-right: 24px;
+		margin: 39.12px 24px 0 12px; //top is 24px + 12px * 1.26
 		border-radius: 6px;
 		border: none;
 		padding: 0;
 		color: var(--btn-color-var-1);
 	}
 
-	.tasks:not(:has(article)),
+	/*.tasks:not(:has(article)),*/
 	button.column {
 		background: linear-gradient(180deg, #e9effa 0%, rgba(233, 239, 250, 0.5) 100%);
 		:global(.dark) & {
@@ -222,6 +269,14 @@
 	button.column span {
 		@extend %heading-1;
 		color: inherit;
+	}
+
+	article {
+		width: 280px;
+		padding: 0 12px;
+	}
+	article.ghost {
+		//height: 0px;
 	}
 
 	.show-sidebar {

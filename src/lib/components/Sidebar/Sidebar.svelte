@@ -19,7 +19,7 @@
 
 	let testOldCol, testOldTask, testNewCol, testNewTask;
 	async function testAPI() {
-		const response = await fetch("/", {
+		const response = await fetch("/api/moveTask", {
 			method: "POST",
 			body: JSON.stringify({
 				boardId: $mainStore.currentBoard,

@@ -12,7 +12,8 @@ const startObject = {
 	},
 	immediateNewColumn: false,
 	dragInProgress: false,
-	dragged: null, // {oldInfo: {colId, taskId}, newInfo: {colId, taskId}}
+	dragIsPending: false,
+	dragged: { oldInfo: { colId: null, taskId: null }, newInfo: { colId: null, taskId: null } },
 	darkMode: true,
 	showSidebarOnBigScreen: true,
 };

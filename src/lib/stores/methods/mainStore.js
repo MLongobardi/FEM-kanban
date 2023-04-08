@@ -47,18 +47,29 @@ export function afterActionModal(draft) {
 }
 
 export function startDrag(draft, oldInfo) {
-	if (draft.dragInProgress) return;
+	if (draft.dragInProgress || draft.dragIsPending) return;
 	draft.dragInProgress = true;
-	draft.dragged = { oldInfo: oldInfo, newInfo: { colId: null, taskId: null } };
+	draft.dragIsPending = true;
+	draft.dragged = { oldInfo: oldInfo, newInfo: { colId: oldInfo.colId, taskId: oldInfo.taskId } };
 }
 
 export function updateDrag(draft, newInfo) {
-	if (!draft.dragInProgress) return;
+	if (!draft.dragInProgress || !draft.dragIsPending) return;
 	draft.dragged.newInfo = newInfo;
 }
 
 export function endDrag(draft) {
-	if (!draft.dragInProgress) return;
+	if (!draft.dragInProgress || !draft.dragIsPending) return;
 	draft.dragInProgress = false;
-	draft.dragged = null;
+	setTimeout(this.completeDrag, 7000) //temp
+}
+
+export function completeDrag(draft) {
+	if (!draft.dragIsPending) return;
+	console.log("drag completed")
+	draft.dragIsPending = false;
+	draft.dragged = {
+		oldInfo: { colId: null, taskId: null },
+		newInfo: { colId: null, taskId: null },
+	};
 }
