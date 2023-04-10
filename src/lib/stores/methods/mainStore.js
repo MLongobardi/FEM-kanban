@@ -61,12 +61,24 @@ export function updateDrag(draft, newInfo) {
 export function endDrag(draft) {
 	if (!draft.dragInProgress || !draft.dragIsPending) return;
 	draft.dragInProgress = false;
-	setTimeout(this.completeDrag, 7000) //temp
+	if (
+		draft.dragged.oldInfo.colId == draft.dragged.newInfo.colId &&
+		draft.dragged.oldInfo.taskId == draft.dragged.newInfo.taskId
+	) {
+		this.completeDrag();
+	} else {
+		console.log("drag pending...");
+		setTimeout(this.completeDrag, 3000); //temp
+		//NOTE: when you will send a request to the backend to apply the changes
+		//you will need to run this:
+		//newInfo.taskId = Math.max(0, newInfo.taskId - 1)
+		//when the temporary task is above the ghost (?)
+	}
 }
 
 export function completeDrag(draft) {
 	if (!draft.dragIsPending) return;
-	console.log("drag completed")
+	console.log("drag completed");
 	draft.dragIsPending = false;
 	draft.dragged = {
 		oldInfo: { colId: null, taskId: null },

@@ -187,7 +187,7 @@
 	}
 
 	.task-card {
-		--gap: 20px;
+		--click-offset: 4px;
 		position: relative;
 		z-index: 1;
 		width: 100%;
@@ -195,7 +195,7 @@
 		padding: 23px 16px;
 		border-radius: 8px;
 		background: white;
-		margin-bottom: var(--gap);
+		margin-bottom: var(--click-offset);
 		box-shadow: 0px 4px 6px rgba(54, 78, 126, 0.101545);
 		background: var(--background-color);
 	}
@@ -212,8 +212,8 @@
 	}
 	.task-card:active:not(.dragging),
 	.task-card:has(button:focus-visible) {
-		margin-top: 4px;
-		margin-bottom: calc(var(--gap) - 4px);
+		margin-top: var(--click-offset);
+		margin-bottom: 0;
 		box-shadow: none;
 	}
 	.task-card:has(button:focus-visible) {
@@ -239,7 +239,7 @@
 	}
 	.task-card.ghost {
 		opacity: 0.4;
-		margin-top: calc(var(--ghost-offset) - var(--gap));
+		margin-top: calc(var(--ghost-offset) - var(--click-offset));
 	}
 
 	button {

@@ -75,7 +75,7 @@
 	});
 </script>
 
-<div in:inTransition>
+<div class="modal" in:inTransition>
 	<h2>{isAdd ? "Add New" : "Edit"} {isTask ? "Task" : "Board"}</h2>
 	<form
 		method="POST"
@@ -190,6 +190,10 @@
 </div>
 
 <style lang="scss">
+	.modal {
+		overflow-x: hidden;
+		overflow-y: auto;
+	}
 	.error {
 		color: var(--red);
 	}

@@ -8,7 +8,6 @@
 	import { flip } from "svelte/animate";
 
 	let main;
-	//$:console.log($mainStore.dragged?.oldInfo?.taskId,"->", $mainStore.dragged?.newInfo?.taskId)
 
 	$: optimisticColumns = $page.data.boards[$mainStore.currentBoard].columns.map((c, colId) => ({
 		name: c.name,
@@ -16,54 +15,73 @@
 	}));
 
 	function optimisticTasks(colTarget, tasks) {
+		const colKey = "\u200a".repeat(colTarget + 1); //task title is used as key for #each block
 		if ($mainStore.dragInProgress) {
-			return injectDraggedTask(colTarget, tasks);
+			return injectDraggedTask(colTarget, tasks, colKey);
 		} else if ($mainStore.dragIsPending) {
 			/*backend hasn't finished processing request*/
 			let answer = tasks;
 			let oldInfo = $mainStore.dragged.oldInfo;
 			let newInfo = $mainStore.dragged.newInfo;
 			if (oldInfo.colId == colTarget) {
+				//task was dragged from colTarget
 				answer = [...answer.slice(0, oldInfo.taskId), ...answer.slice(oldInfo.taskId + 1)];
 			}
 			if (newInfo.colId == colTarget) {
+				//task was dropped in colTarget
 				let draggedTask =
 					$page.data.boards[$mainStore.currentBoard].columns[oldInfo.colId].tasks[oldInfo.taskId];
 				let newId = newInfo.taskId;
-				if (oldInfo.colId == newInfo.colId) {
-					newId--;
+				if (oldInfo.colId == newInfo.colId && newInfo.taskId > oldInfo.taskId) {
+					newId--; //I don't know why but it works??
 				}
+				draggedTask.title += colKey;
 
 				answer = [...answer.slice(0, newId), draggedTask, ...answer.slice(newId)];
 			}
 			return answer;
 		}
-		return tasks; //if no drag is in progress/pending, or if drag is pending but colTarget isn't affected
+		return tasks;
 	}
 
-	function injectDraggedTask(colTarget, tasks) {
+	function injectDraggedTask(colTarget, tasks, colKey) {
 		if (!$mainStore.dragInProgress) return tasks;
 		let oldInfo = $mainStore.dragged.oldInfo;
 		let newInfo = $mainStore.dragged.newInfo;
+
+		//don't inject task where the ghost is
 		if (oldInfo.colId == newInfo.colId && oldInfo.taskId == newInfo.taskId) return tasks;
-		if (oldInfo.colId == colTarget)
+		//if task was taken from colTarget, apply ghost tag to it
+		//this way, the column title doesn't count both the ghost and the temporary task
+		if (oldInfo.colId == colTarget) {
 			tasks = tasks.map((t, i) => {
 				if (i == oldInfo.taskId) return { ...{ ghost: true }, ...t };
 				return t;
 			});
+		}
+		//if newTask info is invalid, or I am not hovering colTarget, don't inject task
 		if (newInfo.colId == null || newInfo.taskId == null || colTarget != newInfo.colId) return tasks;
+
+		//create temporary task
 		let task =
 			$page.data.boards[$mainStore.currentBoard].columns[oldInfo.colId].tasks[oldInfo.taskId];
 		let tempTask = {
 			temporary: true,
-			title: task.title + "\u200a".repeat(colTarget + 1), //title is used as key for #each block
+			title: task.title + colKey,
 			description: task.description,
 			status: task.status,
 			subtasks: task.subtasks,
 		};
 
+		//inject temporary task
 		return [...tasks.slice(0, newInfo.taskId), tempTask, ...tasks.slice(newInfo.taskId)];
 	}
+
+	let debouncedUpdateDrag = debounce((i, j) => {
+		j = Math.min(j, $page.data.boards[$mainStore.currentBoard].columns[i].tasks.length);
+		console.log(i, j);
+		mainStore.updateDrag({ colId: i, taskId: j });
+	}, 50);
 
 	function handleNewColumn() {
 		mainStore.beforeActionModal("BOARD", "EDIT", true);
@@ -78,12 +96,13 @@
 			const transform = style.transform === "none" ? "" : style.transform;
 
 			return {
-				delay: $mainStore.dragIsPending ? 5 : 150,
-				duration: $mainStore.dragIsPending ? 5 : 500,
+				delay: $mainStore.dragIsPending ? 0 : 150,
+				duration: $mainStore.dragIsPending ? 0 : 500,
 				easing: quintOut,
 				css: (t) => `
 					transform: ${transform} scale(${t});
-					opacity: ${t}
+					opacity: ${t};
+					pointer-events: none;
 				`,
 			};
 		},
@@ -102,20 +121,16 @@
 		if (!$mediaStore.misc.prefersReducedMotion) return flip(node, fromTo, options);
 		return {};
 	}
-
-	let debouncedUpdateDrag = debounce((i, j) => {
-		if ($mainStore.dragged.oldInfo.colId == i) {
-			let oldJ = $mainStore.dragged.oldInfo.taskId;
-			if (oldJ == j) j++;
-			console.log(j, optimisticColumns[i].tasks.length);
-			//else if (j == optimisticColumns[i].tasks.length+1) j--;
-			//else j--;
-		}
-		mainStore.updateDrag({ colId: i, taskId: j });
-	}, 50);
 </script>
 
-<main bind:this={main}>
+<main
+	bind:this={main}
+	on:mouseleave={$mainStore.dragInProgress
+		? () => {
+				mainStore.updateDrag($mainStore.dragged.oldInfo);
+		  }
+		: null}
+>
 	{#key $mainStore.currentBoard}
 		{#if $page.data.boards[$mainStore.currentBoard].columns.length > 0}
 			<div class="columns-holder" in:fade>
@@ -124,22 +139,12 @@
 						<h2 style:--dotColor={["#49C4E5", "#8471F2", "#67E2AE"][i % 3]}>
 							{c.name} ({c.tasks.filter((t) => !t?.ghost).length})
 						</h2>
-						<!-- svelte-ignore a11y-mouse-events-have-key-events -->
-						<div
-							class="tasks"
-							on:mouseover|self={$mainStore.dragInProgress
-								? () => {
-										debouncedUpdateDrag.deb(i, c.tasks.length);
-								  }
-								: null}
-						>
+						<div class="tasks">
 							{#each c.tasks as t, j (t.title)}
 								{@const total = t.subtasks.length}
 								{@const completed = t.subtasks.filter((s) => s.isCompleted).length}
-								<!-- svelte-ignore a11y-mouse-events-have-key-events -->
 								<article
-									class:ghost={t?.ghost}
-									on:mouseover={$mainStore.dragInProgress
+									on:mouseenter={$mainStore.dragInProgress
 										? () => {
 												debouncedUpdateDrag.deb(i, j);
 										  }
@@ -148,7 +153,7 @@
 									out:reducedSend|local={{ key: t.title }}
 									animate:reducedFlip={{
 										easing: quintOut,
-										duration: (d) => Math.sqrt(d) * ($mainStore.dragInProgress ? 15 : 200),
+										duration: (d) => Math.sqrt(d) * ($mainStore.dragInProgress ? 20 : 200),
 									}}
 								>
 									<TaskCard
@@ -162,6 +167,14 @@
 									/>
 								</article>
 							{/each}
+							{#if $mainStore.dragInProgress}
+								<span
+									class="catch-drag"
+									on:mouseenter={() => {
+										debouncedUpdateDrag.deb(i, c.tasks.length);
+									}}
+								/>
+							{/if}
 						</div>
 					</section>
 				{/each}
@@ -230,20 +243,6 @@
 		}
 	}
 
-	.tasks {
-		display: flex; //prevents margin collapsing, so that the .task-card:active effect works
-		flex-direction: column;
-		box-sizing: border-box;
-		width: 304px;
-		height: 100%;
-	}
-	.tasks:not(:has(article)) {
-		width: 280px;
-		margin: 0 12px;
-		border-radius: 8px;
-		border: 2px solid var(--lines-color);
-	}
-
 	button.column {
 		--btn-color-var-1: var(--medium-grey);
 		--btn-color-hov-1: var(--main-purple);
@@ -258,7 +257,6 @@
 		color: var(--btn-color-var-1);
 	}
 
-	/*.tasks:not(:has(article)),*/
 	button.column {
 		background: linear-gradient(180deg, #e9effa 0%, rgba(233, 239, 250, 0.5) 100%);
 		:global(.dark) & {
@@ -271,12 +269,21 @@
 		color: inherit;
 	}
 
-	article {
+	.tasks {
+		display: flex; //prevents margin collapsing, so that the .task-card:active effect works
+		flex-direction: column;
+		box-sizing: border-box;
+		margin: 0 12px;
 		width: 280px;
-		padding: 0 12px;
+		height: 100%;
+		gap: 16px;
 	}
-	article.ghost {
-		//height: 0px;
+	.tasks:not(:has(article)) {
+		border-radius: 8px;
+		border: 2px solid var(--lines-color);
+	}
+	.tasks .catch-drag {
+		flex-grow: 1;
 	}
 
 	.show-sidebar {

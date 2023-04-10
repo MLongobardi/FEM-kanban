@@ -61,67 +61,69 @@
 			<img class="open-menu" alt="Open this task menu" src="/images/icon-vertical-ellipsis.svg" />
 		</Dropdown>
 	</div>
-	<p>{task.description}</p>
+	<div class="body">
+		<p>{task.description}</p>
 
-	<form
-		bind:this={form}
-		method="POST"
-		action="?/editTaskInView"
-		data-sveltekit-keepfocus
-		on:change={function () {
-			debouncedSubmit.deb(this);
-		}}
-		use:enhance={() => {
-			return async ({ data, update }) => {
-				await update({ reset: false });
-				if (data.get("status") != task.status) {
-					columnId = $page.data.boards[$mainStore.currentBoard].columns.findIndex(
-						(col) => col.name == data.get("status")
-					);
-					taskId = $page.data.boards[$mainStore.currentBoard].columns[columnId].tasks.findIndex(
-						(t) => t.title == task.title
-					);
-				}
-				if (form) {
-					task = $page.data.boards[$mainStore.currentBoard].columns[columnId].tasks[taskId];
-					optimisticUI = task.subtasks.map((s) => ({ isCompleted: s.isCompleted }));
-					useOptimistic = false;
-				}
-			};
-		}}
-	>
-		<input type="hidden" name="taskInfo" value={[$mainStore.currentBoard, columnId, taskId]} />
-		<fieldset class="subtasks">
-			<legend>Subtasks ({completed} of {total})</legend>
-			{#each task.subtasks as s, i}
-				<label>
-					<input
-						type="checkbox"
-						checked={s.isCompleted}
-						name="isCompleted"
-						value={s.title}
-						on:change={() => {
-							optimisticUI[i].isCompleted = !optimisticUI[i].isCompleted;
-							useOptimistic = true;
-						}}
-					/>
-					{s.title}
-				</label>
-			{/each}
-		</fieldset>
-		<fieldset>
-			<legend>Current Status:</legend>
-			<Select
-				name="status"
-				options={$page.data.boards[$mainStore.currentBoard].columns.map((col) => ({
-					value: col.name,
-					label: col.name,
-				}))}
-				initial={columnId}
-				chevron={false}
-			/>
-		</fieldset>
-	</form>
+		<form
+			bind:this={form}
+			method="POST"
+			action="?/editTaskInView"
+			data-sveltekit-keepfocus
+			on:change={function () {
+				debouncedSubmit.deb(this);
+			}}
+			use:enhance={() => {
+				return async ({ data, update }) => {
+					await update({ reset: false });
+					if (data.get("status") != task.status) {
+						columnId = $page.data.boards[$mainStore.currentBoard].columns.findIndex(
+							(col) => col.name == data.get("status")
+						);
+						taskId = $page.data.boards[$mainStore.currentBoard].columns[columnId].tasks.findIndex(
+							(t) => t.title == task.title
+						);
+					}
+					if (form) {
+						task = $page.data.boards[$mainStore.currentBoard].columns[columnId].tasks[taskId];
+						optimisticUI = task.subtasks.map((s) => ({ isCompleted: s.isCompleted }));
+						useOptimistic = false;
+					}
+				};
+			}}
+		>
+			<input type="hidden" name="taskInfo" value={[$mainStore.currentBoard, columnId, taskId]} />
+			<fieldset class="subtasks">
+				<legend>Subtasks ({completed} of {total})</legend>
+				{#each task.subtasks as s, i}
+					<label>
+						<input
+							type="checkbox"
+							checked={s.isCompleted}
+							name="isCompleted"
+							value={s.title}
+							on:change={() => {
+								optimisticUI[i].isCompleted = !optimisticUI[i].isCompleted;
+								useOptimistic = true;
+							}}
+						/>
+						{s.title}
+					</label>
+				{/each}
+			</fieldset>
+			<fieldset>
+				<legend>Current Status:</legend>
+				<Select
+					name="status"
+					options={$page.data.boards[$mainStore.currentBoard].columns.map((col) => ({
+						value: col.name,
+						label: col.name,
+					}))}
+					initial={columnId}
+					chevron={false}
+				/>
+			</fieldset>
+		</form>
+	</div>
 </div>
 
 <style lang="scss">
@@ -132,9 +134,13 @@
 	.header h2 {
 		flex-grow: 1;
 	}
-
-	div :global(.dropdown-holder) {
+	.header :global(.dropdown-holder) {
 		margin-right: -17.5px;
+	}
+
+	.body {
+		overflow-x: hidden;
+		overflow-y: auto;
 	}
 
 	p {
