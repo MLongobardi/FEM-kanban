@@ -123,12 +123,12 @@ export function deleteBoard(userId, boardId) {
 	db.set(userId, data);
 }
 
-export function testAPI(userid, boardId, oldInfo, newInfo) {
+export function dropTask(userid, boardId, oldInfo, newInfo) {
 	const data = db.get(userid);
 
-	const task = data.boards[boardId].columns[oldInfo.col].tasks.splice(oldInfo.task, 1)[0];
-	task.status = data.boards[boardId].columns[newInfo.col].name;
-	data.boards[boardId].columns[newInfo.col].tasks.splice(newInfo.task, 0, task);
+	const task = data.boards[boardId].columns[oldInfo.colId].tasks.splice(oldInfo.taskId, 1)[0];
+	task.status = data.boards[boardId].columns[newInfo.colId].name;
+	data.boards[boardId].columns[newInfo.colId].tasks.splice(newInfo.taskId, 0, task);
 
 	db.set(userid, data);
 }

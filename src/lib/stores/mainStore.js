@@ -13,7 +13,11 @@ const startObject = {
 	immediateNewColumn: false,
 	dragInProgress: false,
 	dragIsPending: false,
-	dragged: { oldInfo: { colId: null, taskId: null }, newInfo: { colId: null, taskId: null } },
+	dragged: {
+		oldInfo: { colId: null, taskId: null },
+		newInfo: { colId: null, taskId: null },
+		finalInfo: { colId: null, taskId: null }, //taskId can be different when task was moved within same column
+	},
 	darkMode: true,
 	showSidebarOnBigScreen: true,
 };

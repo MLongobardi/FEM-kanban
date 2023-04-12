@@ -33,7 +33,7 @@
 					$page.data.boards[$mainStore.currentBoard].columns[oldInfo.colId].tasks[oldInfo.taskId];
 				let newId = newInfo.taskId;
 				if (oldInfo.colId == newInfo.colId && newInfo.taskId > oldInfo.taskId) {
-					newId--; //I don't know why but it works??
+					newId--;
 				}
 				draggedTask.title += colKey;
 
@@ -79,7 +79,6 @@
 
 	let debouncedUpdateDrag = debounce((i, j) => {
 		j = Math.min(j, $page.data.boards[$mainStore.currentBoard].columns[i].tasks.length);
-		console.log(i, j);
 		mainStore.updateDrag({ colId: i, taskId: j });
 	}, 50);
 

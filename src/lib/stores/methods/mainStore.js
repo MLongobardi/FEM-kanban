@@ -1,3 +1,5 @@
+import { callDropTask } from "$scripts";
+
 export function setBoard(draft, id) {
 	if (draft.currentBoard != id) draft.currentBoard = id;
 }
@@ -50,7 +52,8 @@ export function startDrag(draft, oldInfo) {
 	if (draft.dragInProgress || draft.dragIsPending) return;
 	draft.dragInProgress = true;
 	draft.dragIsPending = true;
-	draft.dragged = { oldInfo: oldInfo, newInfo: { colId: oldInfo.colId, taskId: oldInfo.taskId } };
+	draft.dragged.oldInfo = oldInfo;
+	draft.dragged.newInfo = { colId: oldInfo.colId, taskId: oldInfo.taskId };
 }
 
 export function updateDrag(draft, newInfo) {
@@ -61,27 +64,55 @@ export function updateDrag(draft, newInfo) {
 export function endDrag(draft) {
 	if (!draft.dragInProgress || !draft.dragIsPending) return;
 	draft.dragInProgress = false;
-	if (
-		draft.dragged.oldInfo.colId == draft.dragged.newInfo.colId &&
-		draft.dragged.oldInfo.taskId == draft.dragged.newInfo.taskId
-	) {
-		this.completeDrag();
-	} else {
-		console.log("drag pending...");
-		setTimeout(this.completeDrag, 3000); //temp
-		//NOTE: when you will send a request to the backend to apply the changes
-		//you will need to run this:
-		//newInfo.taskId = Math.max(0, newInfo.taskId - 1)
-		//when the temporary task is above the ghost (?)
+	let actualId = draft.dragged.newInfo.taskId;
+
+	if (draft.dragged.oldInfo.colId == draft.dragged.newInfo.colId) {
+		//both ghost and temporary task are present
+		if (draft.dragged.oldInfo.taskId < actualId) {
+			actualId = Math.max(0, actualId - 1);
+		}
+		if (draft.dragged.oldInfo.taskId == actualId) {
+			this.completeDrag();
+			return;
+		}
 	}
+	draft.dragged.finalInfo = {
+		colId: draft.dragged.newInfo.colId,
+		taskId: actualId,
+	};
+	callDropTask(draft.currentBoard, draft.dragged.oldInfo, draft.dragged.finalInfo, this.completeDrag)
 }
 
 export function completeDrag(draft) {
 	if (!draft.dragIsPending) return;
-	console.log("drag completed");
 	draft.dragIsPending = false;
 	draft.dragged = {
 		oldInfo: { colId: null, taskId: null },
 		newInfo: { colId: null, taskId: null },
+		finalInfo: { colId: null, taskId: null },
 	};
 }
+
+/*
+async function testAPI(board, oldInfo, finalInfo) {
+		const response = await fetch("/api/dropTask", {
+			method: "POST",
+			body: JSON.stringify({
+				boardId: board,
+				oldInfo: oldInfo,
+				newInfo: finalInfo,
+			}),
+			headers: {
+				"Content-Type": "application/json",
+			},
+		});
+		
+		//this.completeDrag(); //before
+		if (response.ok) {
+			await invalidateAll();
+		} else {
+			alert("Something went wrong, reverting drag and drop.")
+		}
+		this.completeDrag(); //or after?
+	}
+*/
