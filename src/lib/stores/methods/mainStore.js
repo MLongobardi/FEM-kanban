@@ -80,12 +80,17 @@ export function endDrag(draft) {
 		colId: draft.dragged.newInfo.colId,
 		taskId: actualId,
 	};
-	callDropTask(draft.currentBoard, draft.dragged.oldInfo, draft.dragged.finalInfo, this.completeDrag)
+	callDropTask(draft.currentBoard, draft.dragged.oldInfo, draft.dragged.finalInfo, this.freezeDrag, this.completeDrag)
+}
+
+export function freezeDrag(draft) {
+	draft.freezeDrag = true;
 }
 
 export function completeDrag(draft) {
 	if (!draft.dragIsPending) return;
 	draft.dragIsPending = false;
+	draft.freezeDrag = false;
 	draft.dragged = {
 		oldInfo: { colId: null, taskId: null },
 		newInfo: { colId: null, taskId: null },

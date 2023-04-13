@@ -1,6 +1,12 @@
 import { invalidateAll } from "$app/navigation";
 
-export default async function callDropTask(board, oldInfo, finalInfo, cb = () => {}) {
+export default async function callDropTask(
+	board,
+	oldInfo,
+	finalInfo,
+	freezeDrag = () => {},
+	completeDrag = () => {}
+) {
 	const response = await fetch("/api/dropTask", {
 		method: "POST",
 		body: JSON.stringify({
@@ -13,17 +19,12 @@ export default async function callDropTask(board, oldInfo, finalInfo, cb = () =>
 		},
 	});
 
-	//cb(); //before? (it's mainStore.completeDrag)
-	setTimeout(() => {
-	//cb()
 	if (response.ok) {
-		invalidateAll();
+		freezeDrag();
+		await invalidateAll();
+		completeDrag();
 	} else {
 		alert("Something went wrong, reverting drag and drop.");
+		setTimeout(completeDrag, 10);
 	}
-	cb();
-	}, 2000);
-	
-	//setTimeout(cb, 100)
-	//cb(); //or after?
 }

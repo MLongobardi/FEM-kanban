@@ -6,6 +6,11 @@
 	font-weight: 100 1000;
 }
 
+* {
+	transition: background-color 0.35s -0.07s, color 0.3s -0.07s, border-color 0.25s -0.07s;
+	//the delay syncs it better with the +Add New Column button (which being a gradient can't use transitions)
+}
+
 body {
 	--heading-color: var(--black); //h1, h2 ...
 	--background-color: white;
@@ -43,8 +48,6 @@ dialog::backdrop {
 }
 dialog > div {
 	max-height: 90vh;
-	//overflow-x: hidden; //should really be visible, but apparently if one is set to auto/scroll the other can't be set to visible
-	//overflow-y: auto;
 	align-items: unset !important;
 	justify-content: unset !important;
 	background: var(--background-color);

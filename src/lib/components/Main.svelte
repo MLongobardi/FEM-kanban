@@ -14,12 +14,16 @@
 		tasks: optimisticTasks(colId, c.tasks),
 	}));
 
+	let lastCalculated = new Map();
+
 	function optimisticTasks(colTarget, tasks) {
-		const colKey = "\u200a".repeat(colTarget + 1); //task title is used as key for #each block
+		//const colKey = "\u200a".repeat(colTarget + 1); //task title is used as key for #each block
+		const colKey = "d"+"*".repeat(colTarget + 1); //test
 		if ($mainStore.dragInProgress) {
 			return injectDraggedTask(colTarget, tasks, colKey);
 		} else if ($mainStore.dragIsPending) {
 			/*backend hasn't finished processing request*/
+			if ($mainStore.freezeDrag) return lastCalculated.get(colTarget); //invalidateAll is executing
 			let answer = tasks;
 			let oldInfo = $mainStore.dragged.oldInfo;
 			let newInfo = $mainStore.dragged.newInfo;
@@ -29,16 +33,25 @@
 			}
 			if (newInfo.colId == colTarget) {
 				//task was dropped in colTarget
-				let draggedTask =
+				let task =
 					$page.data.boards[$mainStore.currentBoard].columns[oldInfo.colId].tasks[oldInfo.taskId];
+				let draggedTask = {
+					//title: task.title.trim() + colKey, //test
+					//title: task.title + colKey,
+					title: task.title,
+					id: task.id + colKey,
+					description: task.description,
+					status: task.status,
+					subtasks: task.subtasks,
+				};
 				let newId = newInfo.taskId;
 				if (oldInfo.colId == newInfo.colId && newInfo.taskId > oldInfo.taskId) {
 					newId--;
 				}
-				draggedTask.title += colKey;
 
 				answer = [...answer.slice(0, newId), draggedTask, ...answer.slice(newId)];
 			}
+			lastCalculated.set(colTarget, answer);
 			return answer;
 		}
 		return tasks;
@@ -67,7 +80,10 @@
 			$page.data.boards[$mainStore.currentBoard].columns[oldInfo.colId].tasks[oldInfo.taskId];
 		let tempTask = {
 			temporary: true,
-			title: task.title + colKey,
+			//title: task.title.trim() + colKey, //test
+			//title: task.title + colKey,
+			title: task.title,
+			id: task.id + colKey,
 			description: task.description,
 			status: task.status,
 			subtasks: task.subtasks,
@@ -139,7 +155,7 @@
 							{c.name} ({c.tasks.filter((t) => !t?.ghost).length})
 						</h2>
 						<div class="tasks">
-							{#each c.tasks as t, j (t.title)}
+							{#each c.tasks as t, j (t.id)} <!--(t.title)-->
 								{@const total = t.subtasks.length}
 								{@const completed = t.subtasks.filter((s) => s.isCompleted).length}
 								<article
@@ -148,8 +164,8 @@
 												debouncedUpdateDrag.deb(i, j);
 										  }
 										: null}
-									in:reducedReceive|local={{ key: t.title }}
-									out:reducedSend|local={{ key: t.title }}
+									in:reducedReceive|local={{ key: t.id /*t.title*/ }}
+									out:reducedSend|local={{ key: t.id /*t.title*/ }}
 									animate:reducedFlip={{
 										easing: quintOut,
 										duration: (d) => Math.sqrt(d) * ($mainStore.dragInProgress ? 20 : 200),
@@ -276,6 +292,7 @@
 		width: 280px;
 		height: 100%;
 		gap: 16px;
+		transition: none;
 	}
 	.tasks:not(:has(article)) {
 		border-radius: 8px;

@@ -13,6 +13,7 @@ const startObject = {
 	immediateNewColumn: false,
 	dragInProgress: false,
 	dragIsPending: false,
+	freezeDrag: false,
 	dragged: {
 		oldInfo: { colId: null, taskId: null },
 		newInfo: { colId: null, taskId: null },
