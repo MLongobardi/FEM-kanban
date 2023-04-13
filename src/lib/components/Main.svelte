@@ -17,8 +17,7 @@
 	let lastCalculated = new Map();
 
 	function optimisticTasks(colTarget, tasks) {
-		//const colKey = "\u200a".repeat(colTarget + 1); //task title is used as key for #each block
-		const colKey = "d"+"*".repeat(colTarget + 1); //test
+		const colKey = "d"+"*".repeat(colTarget + 1); //task id is used as key for #each block
 		if ($mainStore.dragInProgress) {
 			return injectDraggedTask(colTarget, tasks, colKey);
 		} else if ($mainStore.dragIsPending) {
@@ -36,8 +35,6 @@
 				let task =
 					$page.data.boards[$mainStore.currentBoard].columns[oldInfo.colId].tasks[oldInfo.taskId];
 				let draggedTask = {
-					//title: task.title.trim() + colKey, //test
-					//title: task.title + colKey,
 					title: task.title,
 					id: task.id + colKey,
 					description: task.description,
@@ -65,7 +62,7 @@
 		//don't inject task where the ghost is
 		if (oldInfo.colId == newInfo.colId && oldInfo.taskId == newInfo.taskId) return tasks;
 		//if task was taken from colTarget, apply ghost tag to it
-		//this way, the column title doesn't count both the ghost and the temporary task
+		//this way, the column title's number doesn't count both the ghost and the temporary task
 		if (oldInfo.colId == colTarget) {
 			tasks = tasks.map((t, i) => {
 				if (i == oldInfo.taskId) return { ...{ ghost: true }, ...t };
@@ -80,8 +77,6 @@
 			$page.data.boards[$mainStore.currentBoard].columns[oldInfo.colId].tasks[oldInfo.taskId];
 		let tempTask = {
 			temporary: true,
-			//title: task.title.trim() + colKey, //test
-			//title: task.title + colKey,
 			title: task.title,
 			id: task.id + colKey,
 			description: task.description,
@@ -96,7 +91,7 @@
 	let debouncedUpdateDrag = debounce((i, j) => {
 		j = Math.min(j, $page.data.boards[$mainStore.currentBoard].columns[i].tasks.length);
 		mainStore.updateDrag({ colId: i, taskId: j });
-	}, 50);
+	}, 40);
 
 	function handleNewColumn() {
 		mainStore.beforeActionModal("BOARD", "EDIT", true);
@@ -155,7 +150,7 @@
 							{c.name} ({c.tasks.filter((t) => !t?.ghost).length})
 						</h2>
 						<div class="tasks">
-							{#each c.tasks as t, j (t.id)} <!--(t.title)-->
+							{#each c.tasks as t, j (t.id)}
 								{@const total = t.subtasks.length}
 								{@const completed = t.subtasks.filter((s) => s.isCompleted).length}
 								<article
@@ -164,11 +159,11 @@
 												debouncedUpdateDrag.deb(i, j);
 										  }
 										: null}
-									in:reducedReceive|local={{ key: t.id /*t.title*/ }}
-									out:reducedSend|local={{ key: t.id /*t.title*/ }}
+									in:reducedReceive|local={{ key: t.id }}
+									out:reducedSend|local={{ key: t.id }}
 									animate:reducedFlip={{
 										easing: quintOut,
-										duration: (d) => Math.sqrt(d) * ($mainStore.dragInProgress ? 20 : 200),
+										duration: (d) => Math.sqrt(d) * ($mainStore.dragInProgress ? 15 : 80),
 									}}
 								>
 									<TaskCard

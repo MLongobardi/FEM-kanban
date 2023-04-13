@@ -14,7 +14,6 @@
 
 	let button,
 		card,
-		timeout,
 		mainBoundingRect,
 		dragging = false,
 		neverDragged = true,
@@ -33,8 +32,7 @@
 			r: 3 + 16, //sidebar
 			t: 3 + 4, //I don't know why but it needs 4px more
 			b: 3 + 12, //sidebar
-		},
-		delay = 150;
+		};
 
 	let heightJump = 0; //if moving a card up in the same column
 	$: heightJump =
@@ -48,7 +46,7 @@
 		{ l: 0, t: 0 },
 		{
 			stiffness: 0.1,
-			damping: 0.27,
+			damping: 0.19,
 			precision: 0.1,
 		}
 	);
@@ -63,7 +61,10 @@
 			bt = Math.min(bt, mainBoundingRect.bottom - card.offsetHeight - boundOffset.b);
 		}
 
-		return { l: bl + offsetX - baseX + scrolledX, t: bt + offsetY - baseY + scrolledY + heightJump };
+		return {
+			l: bl + offsetX - baseX + scrolledX,
+			t: bt + offsetY - baseY + scrolledY + heightJump,
+		};
 	});
 
 	function redirectClick(e) {
@@ -84,13 +85,27 @@
 	}
 
 	function handleDrag(e) {
-		if (neverDragged) {
-			mainStore.startDrag({ colId: colId, taskId: taskId });
-		}
-		neverDragged = false;
+		if (neverDragged) return firstDrag(e);
 		//mainBoundingRect = main.getBoundingClientRect(); //shouldn't be needed
 		clientX = e.clientX;
 		clientY = e.clientY;
+		updateCoords();
+	}
+	function firstDrag(e) {
+		mainStore.startDrag({ colId: colId, taskId: taskId });
+		neverDragged = false;
+		mainBoundingRect = main.getBoundingClientRect();
+		dragging = true;
+		initialScrollX = main.scrollLeft;
+		initialScrollY = main.scrollTop;
+		baseX = e.clientX;
+		baseY = e.clientY;
+		clientX = baseX;
+		clientY = baseY;
+		offsetX = e.offsetX;
+		offsetY = e.offsetY;
+		main.addEventListener("scroll", handleScroll);
+		document.addEventListener("contextmenu", abort);
 		updateCoords();
 	}
 
@@ -108,27 +123,11 @@
 		mainBoundingRect = main.getBoundingClientRect();
 		if (card.offsetWidth > mainBoundingRect.width - boundOffset.l - boundOffset.r) return;
 		if (card.offsetHeight > mainBoundingRect.height - boundOffset.t - boundOffset.b) return;
-		timeout = setTimeout(() => {
-			if (!card.matches(":hover")) return;
-			mainBoundingRect = main.getBoundingClientRect();
-			dragging = true;
-			initialScrollX = main.scrollLeft;
-			initialScrollY = main.scrollTop;
-			baseX = e.clientX;
-			baseY = e.clientY;
-			clientX = baseX;
-			clientY = baseY;
-			offsetX = e.offsetX;
-			offsetY = e.offsetY;
-			document.addEventListener("mousemove", handleDrag);
-			main.addEventListener("scroll", handleScroll);
-			document.addEventListener("contextmenu", abort);
-			updateCoords();
-		}, delay);
+		document.addEventListener("mousemove", handleDrag);
 	}
+
 	function handlePointerUp(e) {
 		if (ghost) return;
-		clearTimeout(timeout);
 		if ((!dragging || neverDragged) && e && e.target == card) redirectClick(e);
 		mainStore.endDrag();
 		dragging = false;
@@ -232,7 +231,6 @@
 	.task-card.temporary {
 		position: static; //negates z-index and left/top
 		pointer-events: none;
-		
 	}
 	.task-card.temporary {
 		opacity: 0.7;
