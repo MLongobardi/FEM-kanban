@@ -226,7 +226,7 @@
 	.columns-holder {
 		display: flex;
 		height: max-content;
-		min-height: 87%;
+		min-height: 90%;
 		padding-top: 24px;
 		padding-left: 12px;
 	}

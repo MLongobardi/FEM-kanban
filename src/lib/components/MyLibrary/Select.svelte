@@ -24,15 +24,23 @@
 	let select;
 	let holder;
 	let holderWidth;
+	let holderHeight;
+	let holderFromTop = 0;
 	let value = options[initial].value; //initialized to first value
 	$: selectedId = options.findIndex((o) => o.value == value);
 	let showDropdown = false;
 	let lastHovered = null;
 
+	function updateFromTop() {
+		holderFromTop = holder?.getBoundingClientRect().top ?? 0;
+	}
+
 	function openDropdown() {
 		if (showDropdown) return;
 		lastHovered = null;
 		showDropdown = true;
+		updateFromTop();
+		window.addEventListener("scroll", updateFromTop, true)
 		document.addEventListener("pointerup", handlePointerUp);
 	}
 	function handlePointerUp(e) {
@@ -42,6 +50,7 @@
 		}
 	}
 	function closeDropdown() {
+		window.removeEventListener("scroll", updateFromTop);
 		document.removeEventListener("pointerup", handlePointerUp);
 		showDropdown = false;
 		lastHovered = null;
@@ -51,6 +60,7 @@
 	onMount(() => {
 		//onDestroy sometimes gets stuck with saying document is not defined;
 		return () => {
+			window.removeEventListener("scroll", updateFromTop);
 			document.removeEventListener("pointerup", handlePointerUp);
 		};
 	});
@@ -83,7 +93,14 @@
 	</select>
 </div>
 {#if $mediaStore.misc.hoverable}
-	<div class="my-select-wrapper" class:chevron aria-hidden="true" bind:this={holder} bind:clientWidth={holderWidth}>
+	<div
+		class="my-select-wrapper"
+		class:chevron
+		aria-hidden="true"
+		bind:this={holder}
+		bind:clientWidth={holderWidth}
+		bind:clientHeight={holderHeight}
+	>
 		<button
 			class="my-select"
 			tabindex="-1"
@@ -98,9 +115,11 @@
 		{#if showDropdown}
 			<div
 				class="options-holder"
-				style:--parentWidth={holderWidth+"px"}
+				style:--parentWidth={holderWidth + "px"}
+				style:--parentHeight={holderHeight + "px"}
+				style:--fromTop={holderFromTop + "px"}
 				on:focusout={function (e) {
-					//not using an arrow function lets me use the this keyword
+					//not using an arrow function lets me use the "this" keyword
 					if (!this.contains(e.relatedTarget)) closeDropdown();
 				}}
 			>
@@ -180,9 +199,10 @@
 	.options-holder {
 		//position: absolute;
 		//top: calc(100% + 10px);
-		position: fixed;
-		margin-top: 10px;
+		position: fixed; //absolute doesn't work because it doesn't overflow
+		--offset: 10px;
 		width: var(--parentWidth); //set with js because of position: fixed;
+		top: calc(var(--offset) + var(--parentHeight) + var(--fromTop));
 		border-radius: 8px;
 		background: var(--bg);
 		z-index: 1;
