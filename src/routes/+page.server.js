@@ -2,7 +2,7 @@ import { fail } from "@sveltejs/kit";
 import * as db from "$lib/server/db.js";
 import { getId, getCookieExpireDate } from "$lib/server/utils.js";
 
-export function load({ cookies }) {
+export async function load({ cookies }) {
 	let id = getId(cookies);
 	if (!id || id == "test") {
 		//new user
@@ -13,7 +13,7 @@ export function load({ cookies }) {
 		cookies.set("userId", id, { path: "/", expires: getCookieExpireDate() });
 	}
 
-	return db.getData(id) ?? {};
+	return await db.getData(id) ?? {};
 }
 
 export const actions = {
@@ -32,7 +32,7 @@ export const actions = {
 			return fail(422, {
 				title: data.title,
 				error: error.message,
-			})
+			});
 		}
 	},
 
@@ -101,7 +101,8 @@ function processData(preData, type) {
 		} else data[key] = value;
 	}
 
-	if (data.subtasks) data.subtasks = data.subtasks.map((s) => ({ title: s.trim(), isCompleted: false }));
+	if (data.subtasks)
+		data.subtasks = data.subtasks.map((s) => ({ title: s.trim(), isCompleted: false }));
 	if (data.columns) data.columns = data.columns.map((c) => ({ name: c.trim(), tasks: [] }));
 
 	return data;

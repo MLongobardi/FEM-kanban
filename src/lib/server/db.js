@@ -1,3 +1,4 @@
+import mongo from "$lib/server/mongo.js";
 import testData from "./testData.json";
 import startData from "./startData.json";
 
@@ -20,10 +21,15 @@ fixJson(startData);
 
 db.set("test", JSON.parse(JSON.stringify(testData))); //deep copy
 
-export function getData(userId) {
+export async function getData(userId) {
 	if (!db.get(userId)) {
 		db.set(userId, JSON.parse(JSON.stringify(startData)));
 	}
+
+	const mongoTest = await mongo.find({ "user-key": "test" });
+	mongoTest.forEach((d) => {
+		console.log(d._id.toString(), d.data);
+	});
 
 	return db.get(userId);
 }
@@ -132,10 +138,9 @@ export function deleteBoard(userId, boardId) {
 
 export function dropTask(userid, boardId, oldInfo, newInfo) {
 	const data = db.get(userid);
-	//throw new Error("test")
 	const task = data.boards[boardId].columns[oldInfo.colId].tasks.splice(oldInfo.taskId, 1)[0];
 	task.status = data.boards[boardId].columns[newInfo.colId].name;
-	task.id = task.id + "d"+"*".repeat(newInfo.colId + 1);
+	task.id = task.id + "d" + "*".repeat(newInfo.colId + 1);
 	data.boards[boardId].columns[newInfo.colId].tasks.splice(newInfo.taskId, 0, task);
 
 	db.set(userid, data);
