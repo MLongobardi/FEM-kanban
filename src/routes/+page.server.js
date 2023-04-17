@@ -13,12 +13,11 @@ export async function load({ cookies }) {
 		cookies.set("userId", id, { path: "/", expires: getCookieExpireDate() });
 	}
 
-	return await db.getData(id) ?? {};
+	return await db.getData(id, true);
 }
 
 export const actions = {
 	addTask: async ({ cookies, request }) => {
-		//await new Promise((fulfil) => setTimeout(fulfil, 1200)); //test delay
 		const data = processData(await request.formData(), "TASK");
 		const newTask = {
 			title: data.title,
@@ -27,7 +26,7 @@ export const actions = {
 			subtasks: data.subtasks,
 		};
 		try {
-			db.addTask(getId(cookies), data.taskInfo[0], newTask);
+			await db.addTask(getId(cookies), data.taskInfo[0], newTask);
 		} catch (error) {
 			return fail(422, {
 				title: data.title,
@@ -44,18 +43,18 @@ export const actions = {
 			description: data.description,
 			status: data.status,
 		};
-		db.editTask(getId(cookies), data.taskInfo, newTask, data.subtasks);
+		await db.editTask(getId(cookies), data.taskInfo, newTask, data.subtasks);
 	},
 
 	editTaskInView: async ({ cookies, request }) => {
 		const data = processData(await request.formData(), "TASK");
 		if (!data.completedSubtasks) data.completedSubtasks = [];
-		db.editTaskInView(getId(cookies), data.taskInfo, data.completedSubtasks, data.status);
+		await db.editTaskInView(getId(cookies), data.taskInfo, data.completedSubtasks, data.status);
 	},
 
 	deleteTask: async ({ cookies, request }) => {
 		const data = processData(await request.formData(), "TASK");
-		db.deleteTask(getId(cookies), data.taskInfo);
+		await db.deleteTask(getId(cookies), data.taskInfo);
 	},
 
 	addBoard: async ({ cookies, request }) => {
@@ -65,18 +64,18 @@ export const actions = {
 			name: data.name,
 			columns: data.columns,
 		};
-		db.addBoard(getId(cookies), newBoard);
+		await db.addBoard(getId(cookies), newBoard);
 	},
 
 	editBoard: async ({ cookies, request }) => {
 		const data = processData(await request.formData(), "BOARD");
 		if (!data.columns) data.columns = [];
-		db.editBoard(getId(cookies), data.boardId, data.name, data.columns);
+		await db.editBoard(getId(cookies), data.boardId, data.name, data.columns);
 	},
 
 	deleteBoard: async ({ cookies, request }) => {
 		const data = processData(await request.formData(), "BOARD");
-		db.deleteBoard(getId(cookies), data.boardId);
+		await db.deleteBoard(getId(cookies), data.boardId);
 	},
 };
 

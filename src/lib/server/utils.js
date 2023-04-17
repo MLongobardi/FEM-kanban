@@ -1,7 +1,7 @@
 import { dev } from "$app/environment";
 
 const FORCE_TEST = false; //priority
-const FORCE_COOKIES = false;
+const FORCE_COOKIES = true;
 
 export function getId(cookies) {
 	if (FORCE_TEST) return "test";

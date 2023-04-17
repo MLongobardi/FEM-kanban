@@ -47,7 +47,7 @@
 	onMount(() => {
 		debouncedSubmit = debounce((f) => {
 			f.requestSubmit();
-		}, 600);
+		}, 500);
 	});
 	onDestroy(() => {
 		debouncedSubmit.skip(form);
@@ -148,6 +148,10 @@
 		color: var(--medium-grey);
 		margin: 24px 0;
 		white-space: pre-line;
+	}
+
+	fieldset {
+		padding: 1px;
 	}
 
 	.subtasks {
