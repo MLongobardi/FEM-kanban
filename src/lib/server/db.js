@@ -54,6 +54,7 @@ async function setData(userId, newData) {
 }
 
 export async function getData(userId, mergeIds = false) {
+	console.log("getData started")
 	if (userId == "test") {
 		let data = await mongo.findOne({ "user-key": "test" });
 
@@ -89,6 +90,7 @@ export async function getData(userId, mergeIds = false) {
 		data = { value: await mongo.findOne({ "user-key": userId }) };
 	}
 	generateIdMap(userId, data.value.kanbanData);
+	console.log("getData ended");
 	return mergeIds ? mergeDbAndMap(userId, data.value.kanbanData) : data.value.kanbanData;
 }
 

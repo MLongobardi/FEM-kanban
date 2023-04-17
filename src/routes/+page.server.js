@@ -2,7 +2,7 @@ import { fail } from "@sveltejs/kit";
 import * as db from "$lib/server/db.js";
 import { getId, getCookieExpireDate } from "$lib/server/utils.js";
 
-export async function load({ cookies }) {
+export function load({ cookies }) {
 	let id = getId(cookies);
 	if (!id || id == "test") {
 		//new user
@@ -13,7 +13,7 @@ export async function load({ cookies }) {
 		cookies.set("userId", id, { path: "/", expires: getCookieExpireDate() });
 	}
 
-	return await db.getData(id, true);
+	return db.getData(id, true) ?? {};
 }
 
 export const actions = {
