@@ -44,6 +44,18 @@ function mergeDbAndMap(userId, dbData) {
 	return dbData;
 }
 
+function getAllTaskTitles(data, boardId) {
+	let allTaskTitles = [];
+	data.boards[boardId].columns.forEach((col) => {
+		allTaskTitles = allTaskTitles.concat(col.tasks.map((t) => t.title));
+	});
+	return allTaskTitles;
+}
+
+function checkDuplicates(arr) {
+	return new Set(arr).size < arr.length;
+}
+
 async function setData(userId, newData) {
 	await mongo.findOneAndUpdate(
 		{ "user-key": userId },
@@ -54,11 +66,9 @@ async function setData(userId, newData) {
 }
 
 export async function getData(userId, mergeIds = false) {
-	console.log("getData started")
 	if (userId == "test") {
 		let data = await mongo.findOne({ "user-key": "test" });
-
-		//shouldn't happen, but just in case
+		
 		if (!data) {
 			fixJson(testData);
 			await mongo.insertOne({
@@ -71,7 +81,7 @@ export async function getData(userId, mergeIds = false) {
 		return mergeIds ? mergeDbAndMap("test", data.kanbanData) : data.kanbanData;
 	}
 
-	//not test
+	//userId is not test
 	let data = await mongo.findOneAndUpdate(
 		{ "user-key": userId },
 		{
@@ -90,20 +100,18 @@ export async function getData(userId, mergeIds = false) {
 		data = { value: await mongo.findOne({ "user-key": userId }) };
 	}
 	generateIdMap(userId, data.value.kanbanData);
-	console.log("getData ended");
 	return mergeIds ? mergeDbAndMap(userId, data.value.kanbanData) : data.value.kanbanData;
 }
 
 export async function addTask(userId, boardId, newTask) {
-	const data = await getData(userId);
-
-	let allTaskTitles = [];
-	data.boards[boardId].columns.forEach((col) => {
-		allTaskTitles = allTaskTitles.concat(col.tasks.map((t) => t.title));
-	});
-	if (allTaskTitles.includes(newTask.title)) {
+	if (getAllTaskTitles(data, boardId).includes(newTask.title)) {
 		throw new Error("Task titles should be unique");
 	}
+	if (checkDuplicates(newTask.subtasks.map((s) => s.title))) {
+		throw new Error("Subtasks titles should be unique");
+	}
+	const data = await getData(userId);
+
 	let newId = crypto.randomUUID();
 	newTask.id = newId;
 	taskIdsMap.get(userId)[newId] = newId;
@@ -114,10 +122,16 @@ export async function addTask(userId, boardId, newTask) {
 }
 
 export async function editTask(userId, taskInfo, newTask, subtasks) {
+	if (checkDuplicates(subtasks.map(s => s.title))) {
+		throw new Error("Subtasks titles should be unique");
+	}
 	const data = await getData(userId);
 
 	const [boardId, columnId, taskId] = taskInfo;
 	let oldTask = data.boards[boardId].columns[columnId].tasks[taskId];
+	if (oldTask.title != newTask.title && getAllTaskTitles(data, boardId).includes(newTask.title)) {
+		throw new Error("Task titles should be unique");
+	}
 	subtasks = subtasks.map((s) => {
 		let i = oldTask.subtasks.findIndex((el) => el.title == s.title);
 		if (i >= 0) s.isCompleted = oldTask.subtasks[i].isCompleted;
@@ -126,8 +140,7 @@ export async function editTask(userId, taskInfo, newTask, subtasks) {
 	newTask.subtasks = subtasks;
 	newTask.id = oldTask.id;
 	if (oldTask.status == newTask.status) {
-		//trigger animation
-		let newId = crypto.randomUUID();
+		let newId = crypto.randomUUID(); //trigger animation
 		newTask.id = newId;
 		taskIdsMap.get(userId)[newId] = newId;
 		data.boards[boardId].columns[columnId].tasks[taskId] = newTask;
@@ -155,7 +168,6 @@ export async function editTaskInView(userId, taskInfo, completedSubtasks, newSta
 		data.boards[boardId].columns[columnId].tasks[taskId] = task;
 	} else {
 		let newColumnId = data.boards[boardId].columns.findIndex((column) => column.name == newStatus);
-		if (newColumnId < 0) console.log("editTaskInView error");
 		task.status = newStatus;
 		data.boards[boardId].columns[columnId].tasks.splice(taskId, 1);
 		data.boards[boardId].columns[newColumnId].tasks.push(task);
@@ -174,6 +186,9 @@ export async function deleteTask(userId, taskInfo) {
 }
 
 export async function addBoard(userId, newBoard) {
+	if (checkDuplicates(newBoard.columns.map((c) => c.name))) {
+		throw new Error("Column names should be unique");
+	}
 	const data = await getData(userId);
 
 	data.boards.push(newBoard);
@@ -182,10 +197,12 @@ export async function addBoard(userId, newBoard) {
 }
 
 export async function editBoard(userId, boardId, newName, newColumns) {
+	if (checkDuplicates(newColumns.map((c) => c.name))) {
+		throw new Error("Column names should be unique");
+	}
 	const data = await getData(userId);
 
 	const board = data.boards[boardId];
-	//if the columns that are going to be deleted aren't empty, send error
 	board.name = newName;
 	board.columns = newColumns.map((col, id) => ({
 		name: col.name,

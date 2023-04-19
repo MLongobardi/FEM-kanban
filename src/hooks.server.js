@@ -1,8 +1,8 @@
-import { start_mongo } from "$lib/server/mongo.js";
+import { startMongo } from "$lib/server/mongo.js";
 
 try {
-	start_mongo();
-	console.log("Mongo started");
+	startMongo();
+	console.log("Mongo connected");
 } catch (e) {
 	console.error(e);
 }

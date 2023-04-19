@@ -13,6 +13,7 @@
 	let showError = false;
 	let isTask = $mainStore.currentActionTarget == "TASK";
 	let isAdd = $mainStore.currentActionType == "ADD";
+	let formPending = false;
 
 	function reducedFly(node, options) {
 		if (!$mediaStore.misc.prefersReducedMotion) return fly(node, options);
@@ -78,11 +79,14 @@
 <div class="modal" in:inTransition>
 	<h2>{isAdd ? "Add New" : "Edit"} {isTask ? "Task" : "Board"}</h2>
 	<form
+		class:pending={formPending}
 		method="POST"
 		action={(isAdd ? "?/add" : "?/edit") + (isTask ? "Task" : "Board")}
 		use:enhance={() => {
+			formPending = true;
 			return async ({ result, update }) => {
-				await update();
+				await update({ reset: false });
+				formPending = false;
 				if (result.type !== "failure") {
 					if (!isTask && isAdd) mainStore.setBoard($page.data.boards.length - 1);
 					$dialogStore.ADDEDITTASKBOARD.close();
@@ -112,7 +116,7 @@
 					name="title"
 					placeholder="e.g. Take coffee break"
 					value={isAdd ? "" : task.title}
-					pattern="(?!^{isAdd && $page.form?.title
+					pattern="(?!^{$page.form?.title
 						? '\\s*' + $page.form.title + '\\s*'
 						: ''}$)(^.*$)"
 					required
@@ -151,7 +155,7 @@
 						<input
 							name="{iterName}s"
 							type="text"
-							value={isTask ? iter.title : iter.name}
+							bind:value={iter[isTask ? "title" : "name"]}
 							placeholder={placeholders[i % placeholders.length]}
 							required={isTask}
 						/>
@@ -193,6 +197,13 @@
 	.modal {
 		overflow-x: hidden;
 		overflow-y: auto;
+		transition: all 0.2s ease 0.07s;
+
+		&:has(.pending) {
+			transform: scale(0.9);
+			filter: grayscale(0.7);
+			pointer-events: none;
+		}
 	}
 	.error {
 		color: var(--red);

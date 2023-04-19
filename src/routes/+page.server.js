@@ -43,7 +43,14 @@ export const actions = {
 			description: data.description,
 			status: data.status,
 		};
-		await db.editTask(getId(cookies), data.taskInfo, newTask, data.subtasks);
+		try {
+			await db.editTask(getId(cookies), data.taskInfo, newTask, data.subtasks);
+		} catch (error) {
+			return fail(422, {
+				title: data.title,
+				error: error.message,
+			});
+		}
 	},
 
 	editTaskInView: async ({ cookies, request }) => {
@@ -64,13 +71,25 @@ export const actions = {
 			name: data.name,
 			columns: data.columns,
 		};
-		await db.addBoard(getId(cookies), newBoard);
+		try {
+			await db.addBoard(getId(cookies), newBoard);
+		} catch (error) {
+			return fail(422, {
+				error: error.message,
+			});
+		}
 	},
 
 	editBoard: async ({ cookies, request }) => {
 		const data = processData(await request.formData(), "BOARD");
 		if (!data.columns) data.columns = [];
-		await db.editBoard(getId(cookies), data.boardId, data.name, data.columns);
+		try {
+			await db.editBoard(getId(cookies), data.boardId, data.name, data.columns);
+		} catch (error) {
+			return fail(422, {
+				error: error.message,
+			});
+		}
 	},
 
 	deleteBoard: async ({ cookies, request }) => {
@@ -92,7 +111,7 @@ function processData(preData, type) {
 		if (typeof value == "string") value = value.trim();
 		if (key == "subtasks" || key == "columns") {
 			if (!data[key]) data[key] = [];
-			if (!!value && !data[key].includes(value)) data[key] = data[key].concat(value);
+			if (value) data[key] = data[key].concat(value);
 		} else if (key == "taskInfo") data[key] = value.split(",");
 		else if (key == "isCompleted") {
 			if (!data.completedSubtasks) data.completedSubtasks = [];
@@ -100,9 +119,8 @@ function processData(preData, type) {
 		} else data[key] = value;
 	}
 
-	if (data.subtasks)
-		data.subtasks = data.subtasks.map((s) => ({ title: s.trim(), isCompleted: false }));
-	if (data.columns) data.columns = data.columns.map((c) => ({ name: c.trim(), tasks: [] }));
+	if (data.subtasks) data.subtasks = data.subtasks.map((s) => ({ title: s, isCompleted: false }));
+	if (data.columns) data.columns = data.columns.map((c) => ({ name: c, tasks: [] }));
 
 	return data;
 }

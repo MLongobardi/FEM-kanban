@@ -68,7 +68,6 @@
 			bind:this={form}
 			method="POST"
 			action="?/editTaskInView"
-			data-sveltekit-keepfocus
 			on:change={function () {
 				debouncedSubmit.deb(this);
 			}}
