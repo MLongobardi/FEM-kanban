@@ -97,27 +97,3 @@ export function completeDrag(draft) {
 		finalInfo: { colId: null, taskId: null },
 	};
 }
-
-/*
-async function testAPI(board, oldInfo, finalInfo) {
-		const response = await fetch("/api/dropTask", {
-			method: "POST",
-			body: JSON.stringify({
-				boardId: board,
-				oldInfo: oldInfo,
-				newInfo: finalInfo,
-			}),
-			headers: {
-				"Content-Type": "application/json",
-			},
-		});
-		
-		//this.completeDrag(); //before
-		if (response.ok) {
-			await invalidateAll();
-		} else {
-			alert("Something went wrong, reverting drag and drop.")
-		}
-		this.completeDrag(); //or after?
-	}
-*/
