@@ -68,7 +68,7 @@ async function setData(userId, newData) {
 export async function getData(userId, mergeIds = false) {
 	if (userId == "test") {
 		let data = await mongo.findOne({ "user-key": "test" });
-		
+
 		if (!data) {
 			fixJson(testData);
 			await mongo.insertOne({
@@ -104,13 +104,15 @@ export async function getData(userId, mergeIds = false) {
 }
 
 export async function addTask(userId, boardId, newTask) {
-	if (getAllTaskTitles(data, boardId).includes(newTask.title)) {
-		throw new Error("Task titles should be unique");
-	}
 	if (checkDuplicates(newTask.subtasks.map((s) => s.title))) {
 		throw new Error("Subtasks titles should be unique");
 	}
+
 	const data = await getData(userId);
+
+	if (getAllTaskTitles(data, boardId).includes(newTask.title)) {
+		throw new Error("Task titles should be unique");
+	}
 
 	let newId = crypto.randomUUID();
 	newTask.id = newId;
@@ -122,7 +124,7 @@ export async function addTask(userId, boardId, newTask) {
 }
 
 export async function editTask(userId, taskInfo, newTask, subtasks) {
-	if (checkDuplicates(subtasks.map(s => s.title))) {
+	if (checkDuplicates(subtasks.map((s) => s.title))) {
 		throw new Error("Subtasks titles should be unique");
 	}
 	const data = await getData(userId);

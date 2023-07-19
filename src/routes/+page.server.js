@@ -28,10 +28,11 @@ export const actions = {
 		try {
 			await db.addTask(getId(cookies), data.taskInfo[0], newTask);
 		} catch (error) {
-			return fail(422, {
-				title: data.title,
-				error: error.message,
-			});
+			const e = { error: error.message };
+			if (error.message == "Task titles should be unique") {
+				e.title = data.title;
+			}
+			return fail(422, e);
 		}
 	},
 
