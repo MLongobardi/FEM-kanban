@@ -8,8 +8,8 @@
 
 	onMount(() => {
 		loading = false;
-		if ($mediaStore.noPrint.prefersLight) mainStore.changeColorMode(false);
-		if ($mediaStore.noPrint.prefersDark) mainStore.changeColorMode(true);
+		/*if ($mediaStore.noPrint.prefersLight) mainStore.changeColorMode(false);
+		if ($mediaStore.noPrint.prefersDark) mainStore.changeColorMode(true);*/
 	});
 </script>
 

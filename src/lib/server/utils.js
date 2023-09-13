@@ -1,6 +1,6 @@
 import { dev } from "$app/environment";
 
-const FORCE_TEST = false; //priority
+const FORCE_TEST = true; //priority
 const FORCE_COOKIES = false;
 
 export function getId(cookies) {
