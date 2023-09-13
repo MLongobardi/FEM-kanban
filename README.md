@@ -50,7 +50,7 @@ Users should be able to:
 
 ### Links
 
-- Solution URL: [Add solution URL here](https://your-solution-url.com)
+- Solution URL: [https://www.frontendmentor.io/solutions/sveltekit-fullstack-kanban-app-with-drag-and-drop-3W4KZXxOR3](https://www.frontendmentor.io/solutions/sveltekit-fullstack-kanban-app-with-drag-and-drop-3W4KZXxOR3)
 - Live Site URL: [https://fem-kanban-mlongobardi.vercel.app/](https://fem-kanban-mlongobardi.vercel.app/)
 
 ## My process
