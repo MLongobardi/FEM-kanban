@@ -3,13 +3,12 @@
 	import { mainStore, mediaStore } from "$stores";
 	import { onMount } from "svelte";
 
-	//export let data;
 	let loading = true;
 
 	onMount(() => {
 		loading = false;
-		/*if ($mediaStore.noPrint.prefersLight) mainStore.changeColorMode(false);
-		if ($mediaStore.noPrint.prefersDark) mainStore.changeColorMode(true);*/
+		if ($mediaStore.noPrint.prefersLight) mainStore.changeColorMode(false);
+		if ($mediaStore.noPrint.prefersDark) mainStore.changeColorMode(true);
 	});
 </script>
 
