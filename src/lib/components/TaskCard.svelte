@@ -45,8 +45,8 @@
 	const coords = spring(
 		{ l: 0, t: 0 },
 		{
-			stiffness: 0.1,
-			damping: 0.19,
+			stiffness: 0.45,
+			damping: 0.95,
 			precision: 0.1,
 		}
 	);
