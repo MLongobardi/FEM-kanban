@@ -43,10 +43,24 @@
 		if (!$mediaStore.misc.prefersReducedMotion) return scale(node, options);
 	}
 
+	function beforeClose(mode) {
+		if (mode == "easy" && typeof onEasyClose == "function") onEasyClose();
+		if (mode != "easy" && typeof onClose == "function") onClose();
+		showContent = false;
+		clearTimeout(timeout);
+		canInteract = false;
+		dialog.removeEventListener("keydown", closeWithEsc);
+	}
+
+	function closeWithEsc(e) {
+		if (e.key == "Escape") beforeClose();
+	}
+
 	onMount(() => {
 		dialog.myShowModal = () => {
 			if (dialog.open) return;
 			if (typeof onOpen == "function") onOpen();
+			dialog.addEventListener("keydown", closeWithEsc);
 			showContent = true;
 			timeout = setTimeout(() => {
 				canInteract = true;
@@ -55,11 +69,7 @@
 		};
 		dialog.myClose = (mode) => {
 			if (!dialog.open) return;
-			if (mode == "easy" && typeof onEasyClose == "function") onEasyClose();
-			if (mode != "easy" && typeof onClose == "function") onClose();
-			showContent = false;
-			clearTimeout(timeout);
-			canInteract = false;
+			beforeClose(mode);
 			dialog.close();
 		};
 
